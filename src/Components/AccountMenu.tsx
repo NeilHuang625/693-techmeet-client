@@ -63,7 +63,7 @@ const loginValidationSchema = yup.object({
 
 const AccountMenu = () => {
   const navigate = useNavigate();
-  const { isAuthenticated, checkAuth } = useAuth();
+  const { isAuthenticated, checkAuth, user, setUser } = useAuth();
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null); // for the Avatar Icon
   const [anchorEl2, setAnchorEl2] = useState<null | HTMLElement>(null); // for the custom button
@@ -80,8 +80,8 @@ const AccountMenu = () => {
   const formik = useFormik({
     initialValues: {
       email: "",
-      nickname: "",
       password: "",
+      nickname: "",
       confirmPassword: "",
     },
     validationSchema: signupValidationSchema,
@@ -89,7 +89,10 @@ const AccountMenu = () => {
       const { confirmPassword, ...rest } = values;
       try {
         const response = await signup(rest);
+        console.log("res after register", response);
         const jwt = response.data.token.result;
+        const resUser = response.data.user;
+        setUser(resUser);
         localStorage.setItem("jwt", jwt);
         setOpenSignupDialog(false);
         // Update the authentication status
@@ -179,7 +182,11 @@ const AccountMenu = () => {
               aria-haspopup="true"
               aria-expanded={open ? "true" : undefined}
             >
-              <Avatar sx={{ width: 32, height: 32 }}>User_Avatar</Avatar>
+              <Avatar sx={{ width: 32, height: 32 }}>
+                {user?.nickname
+                  ? user.nickname.substring(0, 2)
+                  : user?.email.substring(0, 2)}
+              </Avatar>
             </IconButton>
           </Tooltip>
         </Box>
