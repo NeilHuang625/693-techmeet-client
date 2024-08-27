@@ -1,5 +1,6 @@
 import Home from "./Home";
 import { ThemeProvider } from "./Contexts/ThemeProvider";
+import { AuthProvider } from "./Contexts/AuthProvider";
 import { BrowserRouter as Router } from "react-router-dom";
 
 export interface AppEvent {
@@ -17,9 +18,11 @@ export interface AppEvent {
 function App() {
   return (
     <ThemeProvider>
-      <Router>
-        <Home />
-      </Router>
+      <AuthProvider>
+        <Router>
+          <Home />
+        </Router>
+      </AuthProvider>
     </ThemeProvider>
   );
 }
