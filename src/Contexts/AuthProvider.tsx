@@ -1,5 +1,7 @@
+import { getUserInfo } from "../Utils/API";
 import {
   useState,
+  useEffect,
   createContext,
   useContext,
   Dispatch,
@@ -37,6 +39,21 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     const jwt = localStorage.getItem("jwt");
     setIsAuthenticated(!!jwt);
   };
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      const jwt = localStorage.getItem("jwt");
+      if (jwt) {
+        const response = await getUserInfo(jwt);
+        console.log(response);
+        if (response.status === 200) {
+          setUser(response.data.user);
+          setIsAuthenticated(true);
+        }
+      }
+    };
+    fetchUser();
+  }, []);
 
   return (
     <AuthContext.Provider value={{ user, setUser, isAuthenticated, checkAuth }}>

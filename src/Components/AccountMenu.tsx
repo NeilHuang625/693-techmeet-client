@@ -85,11 +85,10 @@ const AccountMenu = () => {
       confirmPassword: "",
     },
     validationSchema: signupValidationSchema,
-    onSubmit: async (values, { setErrors }) => {
+    onSubmit: async (values, { setErrors, resetForm }) => {
       const { confirmPassword, ...rest } = values;
       try {
         const response = await signup(rest);
-        console.log("res after register", response);
         const jwt = response.data.token.result;
         const resUser = response.data.user;
         setUser(resUser);
@@ -97,6 +96,7 @@ const AccountMenu = () => {
         setOpenSignupDialog(false);
         // Update the authentication status
         checkAuth();
+        resetForm();
       } catch (err) {
         if (err.response && err.response.status === 400) {
           setErrors({ email: "Email alreday in use, try a new one" });
@@ -111,13 +111,17 @@ const AccountMenu = () => {
       password: "",
     },
     validationSchema: loginValidationSchema,
-    onSubmit: async (values, { setErrors }) => {
+    onSubmit: async (values, { setErrors, resetForm }) => {
       try {
         const response = await login(values);
+        console.log("response", response);
         const jwt = response.data.token.result;
+        const resUser = response.data.user;
+        setUser(resUser);
         localStorage.setItem("jwt", jwt);
         setOpenLoginDialog(false);
         checkAuth();
+        resetForm();
       } catch (err) {
         if (err.response && err.response.status === 400) {
           setErrors({
@@ -146,6 +150,7 @@ const AccountMenu = () => {
       if (response.status === 200) {
         localStorage.removeItem("jwt");
         checkAuth();
+        setUser(null);
         handleClose();
       }
     } catch (err) {

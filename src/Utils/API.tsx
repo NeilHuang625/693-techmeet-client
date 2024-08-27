@@ -30,3 +30,16 @@ export const login = async (user: SignupUser) => {
   const response = await axios.post(`${basicURL}/account/login`, user);
   return response;
 };
+
+export const getUserInfo = async (jwt: string) => {
+  const response = await axios.post(
+    `${basicURL}/account/userinfo`,
+    {},
+    {
+      headers: {
+        Authorization: `Bearer ${jwt}`,
+      },
+    }
+  );
+  return response;
+};
