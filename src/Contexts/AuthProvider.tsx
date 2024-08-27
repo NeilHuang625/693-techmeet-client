@@ -19,8 +19,6 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
   const checkAuth = () => {
     const jwt = localStorage.getItem("jwt");
-    console.log("jwt", jwt);
-    console.log("localStorage", localStorage);
     setIsAuthenticated(!!jwt);
   };
 

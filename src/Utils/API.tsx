@@ -28,6 +28,5 @@ export const logout = async (jwt: string) => {
 
 export const login = async (user: SignupUser) => {
   const response = await axios.post(`${basicURL}/account/login`, user);
-  console.log("response", response);
   return response;
 };

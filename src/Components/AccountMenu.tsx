@@ -110,9 +110,7 @@ const AccountMenu = () => {
     validationSchema: loginValidationSchema,
     onSubmit: async (values, { setErrors }) => {
       try {
-        console.log("values", values);
         const response = await login(values);
-        console.log("response", response);
         const jwt = response.data.token.result;
         localStorage.setItem("jwt", jwt);
         setOpenLoginDialog(false);
@@ -121,7 +119,7 @@ const AccountMenu = () => {
         if (err.response && err.response.status === 400) {
           setErrors({
             email: "Invalid email or password",
-            // password: "Invalid email or password",
+            password: "Invalid email or password",
           });
         }
       }
