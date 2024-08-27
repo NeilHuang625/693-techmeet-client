@@ -80,6 +80,7 @@ const AccountMenu = () => {
   const formik = useFormik({
     initialValues: {
       email: "",
+      nickname: "",
       password: "",
       confirmPassword: "",
     },
@@ -239,7 +240,15 @@ const AccountMenu = () => {
               helperText={formik.touched.email && formik.errors.email}
               fullWidth
             />
-            <TextField label="Nickname (optional)" margin="dense" fullWidth />
+            <TextField
+              label="Nickname (optional)"
+              id="nickname"
+              name="nickname"
+              margin="dense"
+              onChange={formik.handleChange}
+              value={formik.values.nickname}
+              fullWidth
+            />
             <TextField
               margin="dense"
               label="Password"
