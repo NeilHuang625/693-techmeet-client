@@ -33,7 +33,7 @@ export const login = async (user: SignupUser) => {
 
 export const getUserInfo = async (jwt: string) => {
   const response = await axios.post(
-    `${basicURL}/account/userinfo`,
+    `${basicURL}/account/user-info`,
     {},
     {
       headers: {
