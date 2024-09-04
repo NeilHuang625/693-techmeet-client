@@ -9,7 +9,8 @@ import {
 import { useAuth } from "../../Contexts/AuthProvider";
 
 const JwtTimeoutDialog = () => {
-  const { isExtendDialogOpen, handleLogout, timeAhead, jwt } = useAuth();
+  const { isExtendDialogOpen, handleLogout, handleJwtRefresh, timeAhead, jwt } =
+    useAuth();
 
   const [timeLeft, setTimeLeft] = useState(timeAhead);
 
@@ -51,7 +52,13 @@ const JwtTimeoutDialog = () => {
         >
           Logout
         </Button>
-        <Button>Stay Logged In</Button>
+        <Button
+          onClick={() => {
+            if (jwt) handleJwtRefresh(jwt);
+          }}
+        >
+          Stay Logged In
+        </Button>
       </DialogActions>
     </Dialog>
   );

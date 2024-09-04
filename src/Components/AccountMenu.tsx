@@ -158,8 +158,6 @@ const AccountMenu = () => {
     }
   };
 
-  console.log("isAuthenticated", isAuthenticated);
-
   return (
     <>
       {isAuthenticated ? (

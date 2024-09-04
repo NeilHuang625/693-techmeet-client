@@ -32,9 +32,9 @@ export const login = async (user: SignupUser) => {
   return response;
 };
 
-export const getUserInfo = async (jwt: string) => {
+export const refreshToken = async (jwt: string) => {
   const response = await axios.post(
-    `${basicURL}/account/user-info`,
+    `${basicURL}/account/refresh-token`,
     {},
     {
       headers: {

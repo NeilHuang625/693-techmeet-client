@@ -1,4 +1,4 @@
-import { logout } from "../Utils/API";
+import { logout, refreshToken } from "../Utils/API";
 import { jwtDecode } from "jwt-decode";
 import {
   useState,
@@ -24,6 +24,7 @@ interface AuthContextType {
   setJwt: Dispatch<SetStateAction<string | null>>;
   isExtendDialogOpen: boolean;
   handleLogout: (jwt: string) => Promise<void>;
+  handleJwtRefresh: (jwt: string) => Promise<void>;
   timeAhead: number;
 }
 
@@ -40,6 +41,7 @@ const AuthContext = createContext<AuthContextType>({
   setJwt: () => {},
   isExtendDialogOpen: false,
   handleLogout: async (jwt: string) => {},
+  handleJwtRefresh: async (jwt: string) => {},
   timeAhead: 0,
 });
 
@@ -48,20 +50,6 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [user, setUser] = useState<User | null>(null);
   const [isExtendDialogOpen, setIsExtendDialogOpen] = useState(false);
   const [jwt, setJwt] = useState<string | null>(localStorage.getItem("jwt"));
-
-  const handleLogout = async (jwt: string) => {
-    try {
-      const response = await logout(jwt);
-      if (response.status === 200) {
-        localStorage.removeItem("jwt");
-        setIsAuthenticated(false);
-        setUser(null);
-        setIsExtendDialogOpen(false);
-      }
-    } catch (err) {
-      console.log(err);
-    }
-  };
 
   const checkIsJwtExpired = (jwt: string) => {
     const decodedJwt = jwtDecode(jwt);
@@ -103,7 +91,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         };
 
         setUser(userData);
-        const fiveMinutes = 1000 * 60 * 5;
+        const fiveMinutes = 1000 * 60 * 5; // 5 Minutes in Milliseconds
 
         const expireTimeInMs = decodedJwt.exp * 1000;
         const currentTimeInMs = new Date().getTime();
@@ -116,7 +104,36 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     }
   }, [jwt]);
 
-  const handleJwtExtend = () => {};
+  const handleLogout = async (jwt: string) => {
+    try {
+      const response = await logout(jwt);
+      if (response.status === 200) {
+        localStorage.removeItem("jwt");
+        setIsAuthenticated(false);
+        setUser(null);
+        setIsExtendDialogOpen(false);
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const handleJwtRefresh = async (jwt: string) => {
+    if (jwt) {
+      try {
+        const response = await refreshToken(jwt);
+        console.log("response", response);
+        if (response.status === 200) {
+          const newJwt = response.data.token.result;
+          setJwt(newJwt);
+          localStorage.setItem("jwt", newJwt);
+          setIsExtendDialogOpen(false);
+        }
+      } catch (err) {
+        console.log(err);
+      }
+    }
+  };
 
   console.log("user", user);
 
@@ -131,6 +148,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         setJwt,
         isExtendDialogOpen,
         handleLogout,
+        handleJwtRefresh,
         timeAhead,
       }}
     >
