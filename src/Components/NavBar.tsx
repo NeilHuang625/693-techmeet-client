@@ -44,14 +44,24 @@ const NavBar = () => {
       <Grid container spacing={2} alignItems="center" style={{ width: "100%" }}>
         {/* Logo */}
         <Grid container size={3}>
-          <Typography
-            variant="h4"
+          <Box
+            display="flex"
+            alignItems="center"
+            justifyContent="center"
             paddingLeft={2}
             onClick={() => navigate("/")}
-            style={{ cursor: "pointer" }}
+            style={{ cursor: "pointer", width: "90%" }}
           >
-            TechMeet
-          </Typography>
+            <img
+              src="src/assets/logo.png"
+              style={{
+                width: "100%",
+                height: "70px",
+                borderBottomLeftRadius: "10px",
+              }}
+              alt="logo"
+            />
+          </Box>
         </Grid>
         {/* Search bar */}
         <Grid size={4}>
