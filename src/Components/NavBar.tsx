@@ -4,25 +4,46 @@ import Paper from "@mui/material/Paper";
 import InputBase from "@mui/material/InputBase";
 import IconButton from "@mui/material/IconButton";
 import SearchIcon from "@mui/icons-material/Search";
-import { Grid, Typography, Box } from "@mui/material";
+import { Typography, Box, Button } from "@mui/material";
+import Grid from "@mui/material/Grid2";
 import AccountMenu from "./AccountMenu";
 import ToggleThemeButton from "./ToggleThemeButton";
 import { useTheme } from "../Contexts/ThemeProvider";
+import { useAuth } from "../Contexts/AuthProvider";
+import UpgradeDialog from "./Dialogs/UpgradeDialog";
+import PaymentDialog from "./Dialogs/PaymentDialog";
 
 const NavBar = () => {
   const { theme, toggleTheme } = useTheme();
+  const { user } = useAuth();
+  const role = user?.roles;
   const [search, setSearch] = useState("");
+  const [openUpgradeDialog, setOpenUpgradeDialog] = useState(false);
+  const [openPaymentDialog, setOpenPaymentDialog] = useState(false);
   const navigate = useNavigate();
 
   const handleSearchChange = (evt: React.ChangeEvent<HTMLInputElement>) => {
     setSearch(evt.target.value);
   };
 
+  const handleUpgradeClick = () => {
+    setOpenUpgradeDialog(false);
+    setOpenPaymentDialog(true);
+  };
+
   return (
-    <Box borderBottom={1} borderColor="#bdbdbd" boxShadow={1} borderRadius={3}>
-      <Grid container spacing={2} alignItems="center">
+    <Box
+      borderBottom={1}
+      borderColor="#bdbdbd"
+      boxShadow={3}
+      borderRadius={3}
+      height="80px"
+      display="flex"
+      alignItems="center"
+    >
+      <Grid container spacing={2} alignItems="center" style={{ width: "100%" }}>
         {/* Logo */}
-        <Grid item xs={3}>
+        <Grid container size={3}>
           <Typography
             variant="h4"
             paddingLeft={2}
@@ -33,14 +54,14 @@ const NavBar = () => {
           </Typography>
         </Grid>
         {/* Search bar */}
-        <Grid item xs={4}>
+        <Grid size={4}>
           <Paper
             component="form"
             sx={{
               p: "2px 4px",
               display: "flex",
               alignItems: "center",
-              width: "100%",
+              width: "80%",
             }}
           >
             <InputBase
@@ -55,13 +76,34 @@ const NavBar = () => {
             </IconButton>
           </Paper>
         </Grid>
-        <Grid item xs>
-          {/* This is an empty Grid item to take up the remaining space */}
-        </Grid>
-        <Grid item xs={2}>
+        {role === "user" ? (
+          <Grid size={2} container justifyContent="center">
+            <Button
+              variant="outlined"
+              onClick={() => setOpenUpgradeDialog(true)}
+            >
+              Upgrade to VIP
+            </Button>
+            <UpgradeDialog
+              open={openUpgradeDialog}
+              onClose={() => setOpenUpgradeDialog(false)}
+              handleUpgrade={handleUpgradeClick}
+            />
+            <PaymentDialog
+              open={openPaymentDialog}
+              onClose={() => setOpenPaymentDialog(false)}
+            />
+          </Grid>
+        ) : (
+          <Grid size={2}>
+            {/* This is an empty Grid item to take up the remaining space */}
+          </Grid>
+        )}
+
+        <Grid size={2}>
           <AccountMenu />
         </Grid>
-        <Grid item xs={2}>
+        <Grid size={1}>
           <ToggleThemeButton theme={theme} toggleTheme={toggleTheme} />
         </Grid>
       </Grid>

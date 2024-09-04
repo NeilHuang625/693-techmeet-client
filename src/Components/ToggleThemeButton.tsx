@@ -17,14 +17,13 @@ const toggleThemeButton: React.FC<ToggleThemeButtonProps> = ({
         display: "flex",
         width: "100%",
         alignItems: "center",
-        justifyContent: "flex-end",
+        justifyContent: "center",
         bgcolor: "background.default",
         color: "text.primary",
         borderRadius: 1,
-        p: 3,
       }}
     >
-      {theme.charAt(0).toUpperCase() + theme.slice(1)} Mode
+      {theme.charAt(0).toUpperCase() + theme.slice(1)}
       <IconButton sx={{ ml: 1 }} onClick={toggleTheme} color="inherit">
         {theme === "dark" ? <Brightness7Icon /> : <Brightness4Icon />}
       </IconButton>

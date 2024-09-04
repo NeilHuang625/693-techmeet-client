@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import Box from "@mui/material/Box";
+import { Box, Stack } from "@mui/material";
 import Button from "@mui/material/Button";
 import Avatar from "@mui/material/Avatar";
 import Menu from "@mui/material/Menu";
@@ -13,6 +13,8 @@ import AddIcon from "@mui/icons-material/Add";
 import EditIcon from "@mui/icons-material/Edit";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import CloseIcon from "@mui/icons-material/Close";
+import LoginIcon from "@mui/icons-material/Login";
+import AppRegistrationIcon from "@mui/icons-material/AppRegistration";
 import {
   Dialog,
   TextField,
@@ -63,7 +65,8 @@ const loginValidationSchema = yup.object({
 
 const AccountMenu = () => {
   const navigate = useNavigate();
-  const { isAuthenticated, checkAuth, user, setUser } = useAuth();
+  const { isAuthenticated, setIsAuthenticated, user, setUser, setJwt } =
+    useAuth();
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null); // for the Avatar Icon
   const [anchorEl2, setAnchorEl2] = useState<null | HTMLElement>(null); // for the custom button
@@ -72,11 +75,7 @@ const AccountMenu = () => {
   const [openSignupDialog, setOpenSignupDialog] = useState(false);
   const [openLoginDialog, setOpenLoginDialog] = useState(false);
 
-  useEffect(() => {
-    // Check the authentication status when the component mounts
-    checkAuth();
-  }, []);
-
+  // Signup form
   const formik = useFormik({
     initialValues: {
       email: "",
@@ -91,11 +90,11 @@ const AccountMenu = () => {
         const response = await signup(rest);
         const jwt = response.data.token.result;
         const resUser = response.data.user;
+        setJwt(jwt);
+        setIsAuthenticated(true);
         setUser(resUser);
         localStorage.setItem("jwt", jwt);
         setOpenSignupDialog(false);
-        // Update the authentication status
-        checkAuth();
         resetForm();
       } catch (err) {
         if (err.response && err.response.status === 400) {
@@ -114,13 +113,14 @@ const AccountMenu = () => {
     onSubmit: async (values, { setErrors, resetForm }) => {
       try {
         const response = await login(values);
-        console.log("response", response);
         const jwt = response.data.token.result;
         const resUser = response.data.user;
         setUser(resUser);
         localStorage.setItem("jwt", jwt);
         setOpenLoginDialog(false);
-        checkAuth();
+        setJwt(jwt);
+        setIsAuthenticated(true);
+
         resetForm();
       } catch (err) {
         if (err.response && err.response.status === 400) {
@@ -140,7 +140,6 @@ const AccountMenu = () => {
     setAnchorEl(null);
     setAnchorEl2(null);
   };
-  console.log("isAuthenticated", isAuthenticated);
 
   const handleLogout = async () => {
     const jwt = localStorage.getItem("jwt");
@@ -149,7 +148,8 @@ const AccountMenu = () => {
 
       if (response.status === 200) {
         localStorage.removeItem("jwt");
-        checkAuth();
+        setJwt(null);
+        setIsAuthenticated(false);
         setUser(null);
         handleClose();
       }
@@ -157,6 +157,8 @@ const AccountMenu = () => {
       console.error("Logout failed", err);
     }
   };
+
+  console.log("isAuthenticated", isAuthenticated);
 
   return (
     <>
@@ -170,6 +172,7 @@ const AccountMenu = () => {
           }}
         >
           <Button
+            variant="text"
             color="inherit"
             aria-controls="event-button"
             aria-haspopup="true"
@@ -196,7 +199,9 @@ const AccountMenu = () => {
           </Tooltip>
         </Box>
       ) : (
-        <Box
+        <Stack
+          direction="row"
+          spacing={2}
           sx={{
             display: "flex",
             alignItems: "center",
@@ -206,19 +211,21 @@ const AccountMenu = () => {
         >
           <Button
             color="inherit"
-            variant="text"
+            variant="outlined"
             onClick={() => setOpenLoginDialog(true)}
+            startIcon={<LoginIcon />}
           >
             Login
           </Button>
           <Button
             color="inherit"
-            variant="text"
+            variant="outlined"
             onClick={() => setOpenSignupDialog(true)}
+            startIcon={<AppRegistrationIcon />}
           >
             Sign up
           </Button>
-        </Box>
+        </Stack>
       )}
 
       {/* Dialog for Signup */}
@@ -288,12 +295,7 @@ const AccountMenu = () => {
               type="password"
               fullWidth
             />
-            <Button
-              color="primary"
-              type="submit"
-              variant="contained"
-              style={{ marginTop: "30px" }}
-            >
+            <Button type="submit" variant="text" style={{ marginTop: "30px" }}>
               Sign Up
             </Button>
           </form>
@@ -342,12 +344,7 @@ const AccountMenu = () => {
                 loginForm.touched.password && loginForm.errors.password
               }
             />
-            <Button
-              color="primary"
-              type="submit"
-              variant="contained"
-              style={{ marginTop: "30px" }}
-            >
+            <Button type="submit" variant="text" style={{ marginTop: "30px" }}>
               Login
             </Button>
           </form>

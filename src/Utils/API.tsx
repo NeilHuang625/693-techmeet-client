@@ -20,6 +20,7 @@ export const logout = async (jwt: string) => {
     {
       headers: {
         Authorization: `Bearer ${jwt}`,
+        "Cache-Control": "no-cache",
       },
     }
   );
@@ -38,6 +39,7 @@ export const getUserInfo = async (jwt: string) => {
     {
       headers: {
         Authorization: `Bearer ${jwt}`,
+        "Cache-Control": "no-cache",
       },
     }
   );
