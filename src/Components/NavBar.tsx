@@ -53,7 +53,7 @@ const NavBar = () => {
             style={{ cursor: "pointer", width: "90%" }}
           >
             <img
-              src="src/assets/logo.png"
+              src="src/assets/logo.jpeg"
               style={{
                 width: "100%",
                 height: "70px",
