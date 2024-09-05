@@ -1,13 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Box, Stack } from "@mui/material";
-import Button from "@mui/material/Button";
-import Avatar from "@mui/material/Avatar";
-import Menu from "@mui/material/Menu";
-import MenuItem from "@mui/material/MenuItem";
-import ListItemIcon from "@mui/material/ListItemIcon";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
-import Tooltip from "@mui/material/Tooltip";
 import Logout from "@mui/icons-material/Logout";
 import AddIcon from "@mui/icons-material/Add";
 import EditIcon from "@mui/icons-material/Edit";
@@ -16,11 +9,19 @@ import CloseIcon from "@mui/icons-material/Close";
 import LoginIcon from "@mui/icons-material/Login";
 import AppRegistrationIcon from "@mui/icons-material/AppRegistration";
 import {
+  Avatar,
+  Button,
+  Box,
+  Stack,
   Dialog,
   TextField,
   DialogTitle,
   DialogContent,
   IconButton,
+  Tooltip,
+  ListItemIcon,
+  Menu,
+  MenuItem,
 } from "@mui/material";
 import { useFormik } from "formik";
 import { signup, logout, login } from "../Utils/API";
@@ -110,7 +111,6 @@ const AccountMenu = () => {
     const jwt = localStorage.getItem("jwt");
     try {
       const response = await logout(jwt);
-
       if (response.status === 200) {
         localStorage.removeItem("jwt");
         setJwt(null);
@@ -321,15 +321,18 @@ const AccountMenu = () => {
         open={Boolean(anchorEl2)}
         onClose={() => setAnchorEl2(null)}
       >
-        <MenuItem
-          onClick={() => {
-            handleClose();
-            navigate("/create-event");
-          }}
-        >
-          <AddIcon fontSize="inherit" />
-          Create
-        </MenuItem>
+        {user?.roles === "vip" && (
+          <MenuItem
+            onClick={() => {
+              handleClose();
+              navigate("/create-event");
+            }}
+          >
+            <AddIcon fontSize="inherit" />
+            Create
+          </MenuItem>
+        )}
+
         <MenuItem>
           <VisibilityIcon fontSize="inherit" />
           View Events

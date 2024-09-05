@@ -1,5 +1,11 @@
 // src/ThemeProvider.tsx
-import React, { createContext, useContext, useState, ReactNode } from "react";
+import React, {
+  createContext,
+  useContext,
+  useState,
+  ReactNode,
+  useEffect,
+} from "react";
 import {
   ThemeProvider as MuiThemeProvider,
   createTheme,
@@ -19,16 +25,27 @@ interface ThemeProviderProps {
 }
 
 export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
-  const [theme, setTheme] = useState<"light" | "dark">("light");
+  const [theme, setTheme] = useState<"light" | "dark">(
+    (localStorage.getItem("theme") as "light" | "dark") || "light"
+  );
 
   const toggleTheme = () => {
-    setTheme((prevTheme) => (prevTheme === "light" ? "dark" : "light"));
+    const newTheme = theme === "light" ? "dark" : "light";
+    setTheme(newTheme);
+    localStorage.setItem("theme", newTheme);
   };
 
   const muiTheme: Theme = createTheme({
     palette: {
       mode: theme,
     },
+  });
+
+  useEffect(() => {
+    const storedTheme = localStorage.getItem("theme") as "light" | "dark";
+    if (storedTheme) {
+      setTheme(storedTheme);
+    }
   });
 
   return (
