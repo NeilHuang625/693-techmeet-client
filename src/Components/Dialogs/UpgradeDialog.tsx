@@ -8,6 +8,7 @@ import {
 } from "@mui/material";
 
 interface UpgradeDialogProps {
+  jwt: string | null;
   open: boolean;
   onClose: () => void;
   handleUpgrade: () => void;

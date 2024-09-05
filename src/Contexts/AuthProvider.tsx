@@ -58,7 +58,9 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     return currentTimeInMs >= expireTimeInMs;
   };
 
-  const timeAhead = 1000 * 50;
+  // Amount of Time to Select Stay Logged In or Logout before the JWT expires
+  const timeAhead = 1000 * 60;
+  const fiveMinutes = 1000 * 60 * 5; // 5 Minutes ahead of the JWT expiration time
 
   useEffect(() => {
     if (jwt) {
@@ -91,7 +93,6 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         };
 
         setUser(userData);
-        const fiveMinutes = 1000 * 60 * 5; // 5 Minutes in Milliseconds
 
         const expireTimeInMs = decodedJwt.exp * 1000;
         const currentTimeInMs = new Date().getTime();

@@ -23,6 +23,7 @@ const JwtTimeoutDialog = () => {
       if (timeLeft === 0) {
         if (jwt) {
           handleLogout(jwt);
+          setTimeLeft(timeAhead);
         }
       }
 
@@ -47,7 +48,10 @@ const JwtTimeoutDialog = () => {
       <DialogActions>
         <Button
           onClick={() => {
-            if (jwt) handleLogout(jwt);
+            if (jwt) {
+              handleLogout(jwt);
+              setTimeLeft(timeAhead);
+            }
           }}
         >
           Logout
@@ -55,6 +59,7 @@ const JwtTimeoutDialog = () => {
         <Button
           onClick={() => {
             if (jwt) handleJwtRefresh(jwt);
+            setTimeLeft(timeAhead);
           }}
         >
           Stay Logged In

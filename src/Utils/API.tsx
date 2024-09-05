@@ -45,3 +45,17 @@ export const refreshToken = async (jwt: string) => {
   );
   return response;
 };
+
+export const upgradeToVIP = async (jwt: string | null) => {
+  const response = await axios.post(
+    `${basicURL}/account/upgrade-to-vip`,
+    {},
+    {
+      headers: {
+        Authorization: `Bearer ${jwt}`,
+        "Cache-Control": "no-cache",
+      },
+    }
+  );
+  return response;
+};

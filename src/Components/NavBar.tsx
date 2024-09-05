@@ -4,7 +4,7 @@ import Paper from "@mui/material/Paper";
 import InputBase from "@mui/material/InputBase";
 import IconButton from "@mui/material/IconButton";
 import SearchIcon from "@mui/icons-material/Search";
-import { Typography, Box, Button } from "@mui/material";
+import { Box, Button } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import AccountMenu from "./AccountMenu";
 import ToggleThemeButton from "./ToggleThemeButton";
@@ -15,7 +15,7 @@ import PaymentDialog from "./Dialogs/PaymentDialog";
 
 const NavBar = () => {
   const { theme, toggleTheme } = useTheme();
-  const { user } = useAuth();
+  const { user, jwt } = useAuth();
   const role = user?.roles;
   const [search, setSearch] = useState("");
   const [openUpgradeDialog, setOpenUpgradeDialog] = useState(false);
@@ -55,8 +55,8 @@ const NavBar = () => {
             <img
               src="src/assets/logo.jpeg"
               style={{
-                width: "100%",
-                height: "70px",
+                width: "90%",
+                height: "60px",
                 borderBottomLeftRadius: "10px",
               }}
               alt="logo"
@@ -98,10 +98,12 @@ const NavBar = () => {
               open={openUpgradeDialog}
               onClose={() => setOpenUpgradeDialog(false)}
               handleUpgrade={handleUpgradeClick}
+              jwt={jwt}
             />
             <PaymentDialog
               open={openPaymentDialog}
               onClose={() => setOpenPaymentDialog(false)}
+              jwt={jwt}
             />
           </Grid>
         ) : (
