@@ -321,7 +321,7 @@ const AccountMenu = () => {
         open={Boolean(anchorEl2)}
         onClose={() => setAnchorEl2(null)}
       >
-        {user?.roles === "vip" && (
+        {user?.roles && ["vip", "admin"].includes(user.roles) && (
           <MenuItem
             onClick={() => {
               handleClose();

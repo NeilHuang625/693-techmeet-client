@@ -137,6 +137,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   };
 
   console.log("user", user);
+  console.log("isAuthenticated", isAuthenticated);
 
   return (
     <AuthContext.Provider

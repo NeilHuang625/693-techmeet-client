@@ -24,7 +24,7 @@ const UpgradeDialog: React.FC<UpgradeDialogProps> = ({
       <Dialog open={open} onClose={onClose}>
         <DialogTitle>1 year VIP for just NZ$200</DialogTitle>
         <DialogContent>
-          <p>Upgrade to VIP to unlock the feature of EVENT creation</p>
+          <p>Upgrade to VIP to unlock the EVENT creation feature</p>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleUpgrade}>Upgrade</Button>

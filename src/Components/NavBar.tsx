@@ -57,6 +57,7 @@ const NavBar = () => {
               style={{
                 width: "90%",
                 height: "60px",
+                objectFit: "contain",
                 borderBottomLeftRadius: "10px",
               }}
               alt="logo"
