@@ -27,10 +27,10 @@ const UpgradeDialog: React.FC<UpgradeDialogProps> = ({
           <p>Upgrade to VIP to unlock the EVENT creation feature</p>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleUpgrade}>Upgrade</Button>
           <Button onClick={onClose} color="error">
             Cancel
           </Button>
+          <Button onClick={handleUpgrade}>Upgrade</Button>
         </DialogActions>
       </Dialog>
     </>

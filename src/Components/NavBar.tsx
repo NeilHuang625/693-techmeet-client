@@ -15,7 +15,7 @@ import PaymentDialog from "./Dialogs/PaymentDialog";
 
 const NavBar = () => {
   const { theme, toggleTheme } = useTheme();
-  const { user, jwt } = useAuth();
+  const { user, jwt, isAuthenticated } = useAuth();
   const role = user?.roles;
   const [search, setSearch] = useState("");
   const [openUpgradeDialog, setOpenUpgradeDialog] = useState(false);
@@ -53,26 +53,25 @@ const NavBar = () => {
             style={{ cursor: "pointer", width: "90%" }}
           >
             <img
+              className="transition transform hover:scale-105"
               src="src/assets/logo.jpeg"
               style={{
                 width: "90%",
                 height: "60px",
                 objectFit: "contain",
-                borderBottomLeftRadius: "10px",
               }}
               alt="logo"
             />
           </Box>
         </Grid>
         {/* Search bar */}
-        <Grid size={4}>
+        <Grid size={3}>
           <Paper
             component="form"
             sx={{
               p: "2px 4px",
               display: "flex",
               alignItems: "center",
-              width: "80%",
             }}
           >
             <InputBase
@@ -87,7 +86,7 @@ const NavBar = () => {
             </IconButton>
           </Paper>
         </Grid>
-        {role === "user" ? (
+        {isAuthenticated && role === "user" ? (
           <Grid size={2} container justifyContent="center">
             <Button
               variant="outlined"
@@ -113,7 +112,7 @@ const NavBar = () => {
           </Grid>
         )}
 
-        <Grid size={2}>
+        <Grid size={3}>
           <AccountMenu />
         </Grid>
         <Grid size={1}>

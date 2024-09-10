@@ -168,7 +168,7 @@ const AccountMenu = () => {
           sx={{
             display: "flex",
             alignItems: "center",
-            justifyContent: "flex-end",
+            justifyContent: "center",
             textAlign: "center",
           }}
         >
