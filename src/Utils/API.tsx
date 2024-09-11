@@ -1,5 +1,4 @@
 import axios from "axios";
-
 const basicURL = "http://localhost:5269";
 
 interface SignupUser {
@@ -57,5 +56,22 @@ export const upgradeToVIP = async (jwt: string | null) => {
       },
     }
   );
+  return response;
+};
+
+// Get Categories
+export const getAllCategories = async () => {
+  const response = await axios.get(`${basicURL}/category`);
+  return response;
+};
+
+// Create Event
+export const createEvent = async (event: any, jwt: string) => {
+  const response = await axios.post(`${basicURL}/event`, event, {
+    headers: {
+      Authorization: `Bearer ${jwt}`,
+      "Cache-Control": "no-cache",
+    },
+  });
   return response;
 };

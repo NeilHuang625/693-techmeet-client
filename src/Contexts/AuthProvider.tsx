@@ -70,6 +70,10 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         localStorage.removeItem("jwt");
         setUser(null);
       } else {
+        if (localStorage.getItem("jwt")) {
+          localStorage.removeItem("jwt");
+        }
+        localStorage.setItem("jwt", jwt);
         setIsAuthenticated(true);
 
         const decodedJwt = jwtDecode(jwt);

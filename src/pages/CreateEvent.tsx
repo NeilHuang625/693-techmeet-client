@@ -1,19 +1,41 @@
 import NavBar from "../Components/NavBar";
+import { useAuth } from "../Contexts/AuthProvider";
+import { getAllCategories, createEvent } from "../Utils/API";
 import {
   InputLabel,
-  Stack,
+  Button,
   TextField,
+  Select,
   Input,
   Box,
   FormControlLabel,
+  FormControl,
+  FormHelperText,
   Checkbox,
+  MenuItem,
 } from "@mui/material";
 import createEventValidationSchema from "../models/createEventValidationSchema";
 import { useFormik, FormikProvider, ErrorMessage } from "formik";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const CreateEvent = () => {
   const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null);
+  const [categories, setCategories] = useState<{ id: string; name: string }[]>(
+    []
+  );
+  const { user, jwt } = useAuth();
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await getAllCategories();
+        setCategories(response.data);
+      } catch (err) {
+        console.log(err);
+      }
+    };
+    fetchCategories();
+  }, []);
 
   const createEventForm = useFormik({
     initialValues: {
@@ -25,11 +47,32 @@ const CreateEvent = () => {
       location: "",
       category: "",
       imageFile: null,
-      isPromoted: false,
+      promoted: false,
     },
     validationSchema: createEventValidationSchema,
-    onSubmit: (values) => {
-      console.log("values", values);
+    onSubmit: async (newEvent) => {
+      if (!jwt) {
+        alert("You need to login to create an event");
+        return;
+      }
+      const userId = user?.id;
+      const formData = new FormData();
+      formData.append("UserId", userId as string);
+      formData.append("Title", newEvent.title);
+      formData.append("StartTime", newEvent.startTime);
+      formData.append("EndTime", newEvent.endTime);
+      formData.append("Description", newEvent.description);
+      formData.append("MaxAttendees", newEvent.maxAttendees.toString());
+      formData.append("Location", newEvent.location);
+      formData.append("CategoryId", newEvent.category.toString());
+      formData.append("Promoted", newEvent.promoted.toString());
+      formData.append("ImageFile", newEvent.imageFile as File);
+
+      try {
+        await createEvent(formData, jwt);
+      } catch (err) {
+        console.log(err);
+      }
     },
   });
 
@@ -37,8 +80,8 @@ const CreateEvent = () => {
     <>
       <FormikProvider value={createEventForm}>
         <NavBar />
-        <div className=" flex justify-center items-center mt-4">
-          <div className="w-3/5 border ">
+        <div className=" flex justify-center items-center mt-4 mb-10">
+          <div className="w-3/5 ">
             <p className="text-xl text-white h-10 bg-gray-400 flex justify-center items-center">
               Create New Event
             </p>
@@ -90,7 +133,11 @@ const CreateEvent = () => {
                 </div>
               </div>
               <ErrorMessage name="imageFile">
-                {(msg) => <p className="text-xs text-red-600">{msg}</p>}
+                {(msg) => (
+                  <p className=" flex justify-end text-xs text-red-600">
+                    {msg}
+                  </p>
+                )}
               </ErrorMessage>
               <div className="flex items-center space-x-6">
                 <InputLabel className="w-[108px]" htmlFor="title">
@@ -216,32 +263,44 @@ const CreateEvent = () => {
                 <InputLabel className="w-[108px]" htmlFor="category">
                   Category
                 </InputLabel>
-                <TextField
+                <FormControl
                   className="w-1/4 min-h-[4rem]"
+                  variant="outlined"
                   size="small"
-                  id="category"
-                  name="category"
-                  label="Category"
-                  value={createEventForm.values.category}
-                  onChange={createEventForm.handleChange}
+                  margin="dense"
                   error={
                     createEventForm.touched.category &&
                     Boolean(createEventForm.errors.category)
                   }
-                  helperText={
-                    createEventForm.touched.category &&
-                    createEventForm.errors.category
-                  }
-                  variant="outlined"
-                  margin="dense"
-                />
+                >
+                  <InputLabel htmlFor="category">Category</InputLabel>
+                  <Select
+                    id="category"
+                    name="category"
+                    value={createEventForm.values.category}
+                    onChange={createEventForm.handleChange}
+                    label="category"
+                  >
+                    {categories.map((category) => (
+                      <MenuItem key={category.id} value={category.id}>
+                        {category.name}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                  {createEventForm.touched.category &&
+                    createEventForm.errors.category && (
+                      <FormHelperText>
+                        {createEventForm.errors.category}
+                      </FormHelperText>
+                    )}
+                </FormControl>
               </div>
               <div className="flex items-baseline space-x-6">
                 <InputLabel className="w-[108px]" htmlFor="description">
                   Description
                 </InputLabel>
                 <TextField
-                  className="w-3/4 min-h-[10rem]"
+                  className="w-3/4 min-h-[7rem]"
                   id="description"
                   size="small"
                   name="description"
@@ -258,22 +317,28 @@ const CreateEvent = () => {
                   }
                   variant="outlined"
                   multiline
-                  rows={4}
+                  rows={3}
                   margin="dense"
                 />
               </div>
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    id="isPromoted"
-                    name="isPromoted"
-                    checked={createEventForm.values.isPromoted}
-                    onChange={createEventForm.handleChange}
-                  />
-                }
-                label="Pay and Promote this event"
-              />
-              <button type="submit">Submit</button>
+              <div className="pl-32">
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      id="promoted"
+                      name="promoted"
+                      checked={createEventForm.values.promoted}
+                      onChange={createEventForm.handleChange}
+                    />
+                  }
+                  label="Pay and Promote this event"
+                />
+              </div>
+              <div className="flex justify-end mt-3">
+                <Button variant="outlined" type="submit">
+                  Create
+                </Button>
+              </div>
             </form>
           </div>
         </div>

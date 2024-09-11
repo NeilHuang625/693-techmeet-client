@@ -24,7 +24,7 @@ const createEventValidationSchema = yup.object().shape({
       (value) => value && (value as File).size <= 2 * 1024 * 1024
     )
     .required("Image is required"),
-  isPromoted: yup.boolean().required("Promotion is required"),
+  promoted: yup.boolean().required("Promotion is required"),
 });
 
 export default createEventValidationSchema;
