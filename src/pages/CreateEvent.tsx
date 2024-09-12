@@ -17,6 +17,7 @@ import {
 import createEventValidationSchema from "../models/createEventValidationSchema";
 import { useFormik, FormikProvider, ErrorMessage } from "formik";
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const CreateEvent = () => {
   const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null);
@@ -24,6 +25,7 @@ const CreateEvent = () => {
     []
   );
   const { user, jwt } = useAuth();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -70,6 +72,7 @@ const CreateEvent = () => {
 
       try {
         await createEvent(formData, jwt);
+        navigate("/events-posted");
       } catch (err) {
         console.log(err);
       }

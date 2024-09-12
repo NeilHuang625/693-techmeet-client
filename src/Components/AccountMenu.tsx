@@ -168,13 +168,13 @@ const AccountMenu = () => {
           sx={{
             display: "flex",
             alignItems: "center",
-            justifyContent: "center",
+            justifyContent: "flex-end",
             textAlign: "center",
           }}
         >
           <Button
             color="inherit"
-            variant="outlined"
+            variant="text"
             onClick={() => setOpenLoginDialog(true)}
             startIcon={<LoginIcon />}
           >
@@ -182,7 +182,7 @@ const AccountMenu = () => {
           </Button>
           <Button
             color="inherit"
-            variant="outlined"
+            variant="text"
             onClick={() => setOpenSignupDialog(true)}
             startIcon={<AppRegistrationIcon />}
           >

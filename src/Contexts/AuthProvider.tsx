@@ -18,6 +18,7 @@ interface User {
 interface AuthContextType {
   isAuthenticated: boolean;
   setIsAuthenticated: Dispatch<SetStateAction<boolean>>;
+  isLoading: boolean;
   user: User | null;
   setUser: Dispatch<SetStateAction<User | null>>;
   jwt: string | null;
@@ -35,6 +36,7 @@ interface AuthProviderProps {
 const AuthContext = createContext<AuthContextType>({
   isAuthenticated: false,
   setIsAuthenticated: () => {},
+  isLoading: true,
   user: null,
   setUser: () => {},
   jwt: null,
@@ -50,6 +52,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [user, setUser] = useState<User | null>(null);
   const [isExtendDialogOpen, setIsExtendDialogOpen] = useState(false);
   const [jwt, setJwt] = useState<string | null>(localStorage.getItem("jwt"));
+  const [isLoading, setIsLoading] = useState(true);
 
   const checkIsJwtExpired = (jwt: string) => {
     const decodedJwt = jwtDecode(jwt);
@@ -63,12 +66,14 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const fiveMinutes = 1000 * 60 * 5; // 5 Minutes ahead of the JWT expiration time
 
   useEffect(() => {
+    setIsLoading(true);
     if (jwt) {
       const isExpired = checkIsJwtExpired(jwt);
       if (isExpired) {
         setIsAuthenticated(false);
         localStorage.removeItem("jwt");
         setUser(null);
+        setIsLoading(false);
       } else {
         if (localStorage.getItem("jwt")) {
           localStorage.removeItem("jwt");
@@ -95,8 +100,8 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
               "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname"
             ],
         };
-
         setUser(userData);
+        setIsLoading(false);
 
         const expireTimeInMs = decodedJwt.exp * 1000;
         const currentTimeInMs = new Date().getTime();
@@ -106,6 +111,8 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         }, timeLeft - timeAhead - fiveMinutes); // Make sure the API receives the valid JWT before it expires
         return () => clearTimeout(timer);
       }
+    } else {
+      setIsLoading(false);
     }
   }, [jwt]);
 
@@ -148,6 +155,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       value={{
         user,
         setUser,
+        isLoading,
         isAuthenticated,
         setIsAuthenticated,
         jwt,

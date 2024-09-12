@@ -75,3 +75,9 @@ export const createEvent = async (event: any, jwt: string) => {
   });
   return response;
 };
+
+// Get All Events
+export const getAllEvents = async () => {
+  const response = await axios.get(`${basicURL}/event`);
+  return response;
+};
