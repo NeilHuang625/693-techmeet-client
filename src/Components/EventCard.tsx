@@ -5,8 +5,10 @@ import {
   Typography,
   CardActions,
   Button,
+  CardActionArea,
 } from "@mui/material";
 import { AppEvent } from "../App";
+import dayjs from "dayjs";
 
 interface EventCardProps {
   event: AppEvent;
@@ -14,25 +16,27 @@ interface EventCardProps {
 
 const EventCard: React.FC<EventCardProps> = ({ event }) => {
   return (
-    <Card>
-      <CardMedia
-        component="img"
-        height="140"
-        image={event.imagePath}
-        alt={event.title}
-      />
-      <CardContent>
-        <Typography gutterBottom variant="h5" component="div">
-          {event.title}
-        </Typography>
-        <Typography variant="body2" color="text.secondary">
-          {event.description}
-        </Typography>
-      </CardContent>
-      <CardActions>
-        <Button size="small">Attend</Button>
-      </CardActions>
-    </Card>
+    <CardActionArea>
+      <Card>
+        <CardMedia
+          className="h-36"
+          component="img"
+          image={event.imageUrl}
+          alt={event.title}
+        />
+        <CardContent>
+          <Typography gutterBottom variant="body1" component="div">
+            {event.title}
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            {event.location}
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            {dayjs(event.startTime).format("ddd, D MMM h:mma")}
+          </Typography>
+        </CardContent>
+      </Card>
+    </CardActionArea>
   );
 };
 

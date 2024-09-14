@@ -1,6 +1,7 @@
 import NavBar from "../Components/NavBar";
 import { useAuth } from "../Contexts/AuthProvider";
 import { getAllCategories, createEvent } from "../Utils/API";
+import Autocomplete, { usePlacesWidget } from "react-google-autocomplete";
 import {
   InputLabel,
   Button,
@@ -50,6 +51,7 @@ const CreateEvent = () => {
       category: "",
       imageFile: null,
       promoted: false,
+      city: "",
     },
     validationSchema: createEventValidationSchema,
     onSubmit: async (newEvent) => {
@@ -66,6 +68,7 @@ const CreateEvent = () => {
       formData.append("Description", newEvent.description);
       formData.append("MaxAttendees", newEvent.maxAttendees.toString());
       formData.append("Location", newEvent.location);
+      formData.append("City", newEvent.city);
       formData.append("CategoryId", newEvent.category.toString());
       formData.append("Promoted", newEvent.promoted.toString());
       formData.append("ImageFile", newEvent.imageFile as File);
@@ -76,6 +79,22 @@ const CreateEvent = () => {
       } catch (err) {
         console.log(err);
       }
+    },
+  });
+
+  const { ref } = usePlacesWidget({
+    apiKey: import.meta.env.VITE_GOOGLE_API_KEY,
+    onPlaceSelected: (place) => {
+      const city = place.address_components.find((component) =>
+        component.types.includes("locality")
+      ).long_name;
+      const address = place.formatted_address;
+      createEventForm.setFieldValue("location", address);
+      createEventForm.setFieldValue("city", city);
+    },
+    options: {
+      types: ["address"],
+      componentRestrictions: { country: "nz" },
     },
   });
 
@@ -172,6 +191,7 @@ const CreateEvent = () => {
                 </InputLabel>
                 <TextField
                   className="w-3/4 min-h-[4rem]"
+                  inputRef={ref}
                   size="small"
                   id="location"
                   name="location"
