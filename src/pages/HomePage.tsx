@@ -63,7 +63,9 @@ const HomePage = () => {
   const [selectedCity, setSelectedCity] = useState<string>("");
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [selectedRadio, setSelectedRadio] = useState<string>("");
-  const [selectedDate, setSelectedDate] = useState<string>("");
+  const [selectedDate, setSelectedDate] = useState<string>(
+    new Date().toISOString().slice(0, 10)
+  );
 
   useEffect(() => {
     const fetchEvents = async () => {

@@ -3,8 +3,6 @@ import {
   CardMedia,
   CardContent,
   Typography,
-  CardActions,
-  Button,
   CardActionArea,
 } from "@mui/material";
 import { AppEvent } from "../App";
@@ -31,7 +29,7 @@ const EventCard: React.FC<EventCardProps> = ({ event }) => {
           <Typography variant="body2" color="text.secondary">
             {event.location}
           </Typography>
-          <Typography variant="body2" color="text.secondary">
+          <Typography variant="body2">
             {dayjs(event.startTime).format("ddd, D MMM h:mma")}
           </Typography>
         </CardContent>

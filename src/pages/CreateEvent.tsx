@@ -1,7 +1,8 @@
 import NavBar from "../Components/NavBar";
+import PromotePaymentDialog from "../Components/Dialogs/PromotePaymentDialog";
 import { useAuth } from "../Contexts/AuthProvider";
 import { getAllCategories, createEvent } from "../Utils/API";
-import Autocomplete, { usePlacesWidget } from "react-google-autocomplete";
+import { usePlacesWidget } from "react-google-autocomplete";
 import {
   InputLabel,
   Button,
@@ -25,6 +26,9 @@ const CreateEvent = () => {
   const [categories, setCategories] = useState<{ id: string; name: string }[]>(
     []
   );
+  const [promotePaymentDialogOpen, setPromotePaymentDialogOpen] =
+    useState<boolean>(false);
+  const [newEvent, setNewEvent] = useState<any>({});
   const { user, jwt } = useAuth();
   const navigate = useNavigate();
 
@@ -39,6 +43,32 @@ const CreateEvent = () => {
     };
     fetchCategories();
   }, []);
+
+  const handleCreateEvent = async (newEvent: any) => {
+    const userId = user?.id;
+    const formData = new FormData();
+    formData.append("UserId", userId as string);
+    formData.append("Title", newEvent.title);
+    formData.append("StartTime", newEvent.startTime);
+    formData.append("EndTime", newEvent.endTime);
+    formData.append("Description", newEvent.description);
+    formData.append("MaxAttendees", newEvent.maxAttendees.toString());
+    formData.append("Location", newEvent.location);
+    formData.append("City", newEvent.city);
+    formData.append("CategoryId", newEvent.category.toString());
+    formData.append("Promoted", newEvent.promoted.toString());
+    formData.append("ImageFile", newEvent.imageFile as File);
+
+    try {
+      if (!jwt) {
+        throw new Error("JWT invalid");
+      }
+      await createEvent(formData, jwt);
+      navigate("/events-posted");
+    } catch (err) {
+      console.log(err);
+    }
+  };
 
   const createEventForm = useFormik({
     initialValues: {
@@ -59,25 +89,12 @@ const CreateEvent = () => {
         alert("You need to login to create an event");
         return;
       }
-      const userId = user?.id;
-      const formData = new FormData();
-      formData.append("UserId", userId as string);
-      formData.append("Title", newEvent.title);
-      formData.append("StartTime", newEvent.startTime);
-      formData.append("EndTime", newEvent.endTime);
-      formData.append("Description", newEvent.description);
-      formData.append("MaxAttendees", newEvent.maxAttendees.toString());
-      formData.append("Location", newEvent.location);
-      formData.append("City", newEvent.city);
-      formData.append("CategoryId", newEvent.category.toString());
-      formData.append("Promoted", newEvent.promoted.toString());
-      formData.append("ImageFile", newEvent.imageFile as File);
+      setNewEvent(newEvent);
 
-      try {
-        await createEvent(formData, jwt);
-        navigate("/events-posted");
-      } catch (err) {
-        console.log(err);
+      if (createEventForm.values.promoted) {
+        setPromotePaymentDialogOpen(true);
+      } else {
+        await handleCreateEvent(newEvent);
       }
     },
   });
@@ -100,9 +117,14 @@ const CreateEvent = () => {
 
   return (
     <>
+      <PromotePaymentDialog
+        open={promotePaymentDialogOpen}
+        onClose={() => setPromotePaymentDialogOpen(false)}
+        handleCreateEvent={() => handleCreateEvent(newEvent)}
+      />
       <FormikProvider value={createEventForm}>
         <NavBar />
-        <div className=" flex justify-center items-center mt-4 mb-10">
+        <div className=" flex justify-center items-center mt-4 pb-8">
           <div className="w-3/5 ">
             <p className="text-xl text-white h-10 bg-gray-400 flex justify-center items-center">
               Create New Event
@@ -354,7 +376,19 @@ const CreateEvent = () => {
                       onChange={createEventForm.handleChange}
                     />
                   }
-                  label="Pay and Promote this event"
+                  label={
+                    <>
+                      Pay and Promote this event (
+                      <span
+                        className={
+                          createEventForm.values.promoted ? "text-red-500" : ""
+                        }
+                      >
+                        $NZD 5 charges apply
+                      </span>
+                      )
+                    </>
+                  }
                 />
               </div>
               <div className="flex justify-end mt-3">

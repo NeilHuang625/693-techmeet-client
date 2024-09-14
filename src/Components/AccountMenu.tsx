@@ -329,13 +329,13 @@ const AccountMenu = () => {
             }}
           >
             <AddIcon fontSize="inherit" />
-            Create
+            Create Event
           </MenuItem>
         )}
 
         <MenuItem>
           <VisibilityIcon fontSize="inherit" />
-          View Events
+          Events Attended
         </MenuItem>
         <MenuItem
           onClick={() => {
@@ -344,7 +344,7 @@ const AccountMenu = () => {
           }}
         >
           <EditIcon fontSize="inherit" />
-          Edit Events
+          Events Posted
         </MenuItem>
       </Menu>
       <Menu
