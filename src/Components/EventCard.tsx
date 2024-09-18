@@ -23,10 +23,31 @@ const EventCard: React.FC<EventCardProps> = ({ event }) => {
           alt={event.title}
         />
         <CardContent>
-          <Typography gutterBottom variant="body1" component="div">
+          <Typography
+            gutterBottom
+            variant="body1"
+            component="div"
+            style={{
+              display: "-webkit-box",
+              WebkitLineClamp: 2,
+              WebkitBoxOrient: "vertical",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+            }}
+          >
             {event.title}
           </Typography>
-          <Typography variant="body2" color="text.secondary">
+          <Typography
+            variant="body2"
+            color="text.secondary"
+            style={{
+              display: "-webkit-box",
+              WebkitLineClamp: 2,
+              WebkitBoxOrient: "vertical",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+            }}
+          >
             {event.location}
           </Typography>
           <Typography variant="body2">

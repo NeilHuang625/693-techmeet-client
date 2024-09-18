@@ -14,7 +14,7 @@ export interface AppEvent {
   startTime: string;
   endTime: string;
   location: string;
-  imagePath: string;
+  imageUrl: string;
   userId: string;
   maxParticipants: string;
 }
