@@ -10,20 +10,26 @@ import AccountMenu from "./AccountMenu";
 import ToggleThemeButton from "./ToggleThemeButton";
 import { useTheme } from "../Contexts/ThemeProvider";
 import { useAuth } from "../Contexts/AuthProvider";
+import { useHomePageContext } from "../pages/HomePage";
 import UpgradeDialog from "./Dialogs/UpgradeDialog";
 import PaymentDialog from "./Dialogs/PaymentDialog";
 
 const NavBar = () => {
   const { theme, toggleTheme } = useTheme();
   const { user, jwt, isAuthenticated } = useAuth();
+  const { setEvents, allEvents } = useHomePageContext();
   const role = user?.roles;
   const [search, setSearch] = useState("");
   const [openUpgradeDialog, setOpenUpgradeDialog] = useState(false);
   const [openPaymentDialog, setOpenPaymentDialog] = useState(false);
   const navigate = useNavigate();
 
-  const handleSearchChange = (evt: React.ChangeEvent<HTMLInputElement>) => {
-    setSearch(evt.target.value);
+  const handleSearchClick = () => {
+    const filteredEvents = allEvents.filter((event) =>
+      event.title.toLowerCase().includes(search.toLowerCase())
+    );
+    setEvents(filteredEvents);
+    setSearch("");
   };
 
   const handleUpgradeClick = () => {
@@ -68,6 +74,11 @@ const NavBar = () => {
         <Grid size={3}>
           <Paper
             component="form"
+            onSubmit={(e) => {
+              e.preventDefault();
+              handleSearchClick();
+              setSearch("");
+            }}
             sx={{
               p: "2px 4px",
               display: "flex",
@@ -79,9 +90,14 @@ const NavBar = () => {
               placeholder="Search Events"
               inputProps={{ "aria-label": "search events" }}
               value={search}
-              onChange={handleSearchChange}
+              onChange={(e) => setSearch(e.target.value)}
             />
-            <IconButton type="button" sx={{ p: "10px" }} aria-label="search">
+            <IconButton
+              onClick={handleSearchClick}
+              type="button"
+              sx={{ p: "10px" }}
+              aria-label="search"
+            >
               <SearchIcon />
             </IconButton>
           </Paper>

@@ -33,6 +33,7 @@ export interface HomePageContextType {
   setSelectedRadio: (radio: string) => void;
   selectedDate: string;
   setSelectedDate: (date: string) => void;
+  allEvents: AppEvent[];
 }
 
 const HomePageContext = createContext<HomePageContextType>({
@@ -46,6 +47,7 @@ const HomePageContext = createContext<HomePageContextType>({
   setSelectedRadio: () => {},
   selectedDate: "",
   setSelectedDate: () => {},
+  allEvents: [],
 });
 
 export const useHomePageContext = () => {
@@ -146,6 +148,7 @@ const HomePage = () => {
         setSelectedRadio,
         selectedDate,
         setSelectedDate,
+        allEvents,
       }}
     >
       <div className="flex flex-col">
