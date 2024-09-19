@@ -6,9 +6,10 @@ import ProtectedRoute from "./Components/ProtectedRoute";
 import JwtTimeoutDialog from "./Components/Dialogs/JwtTimeoutDialog";
 import CreateEvent from "./pages/CreateEvent";
 import EventsPosted from "./pages/EventsPosted";
+import EventDetails from "./pages/EventDetails";
 
 export interface AppEvent {
-  eventId: string;
+  id: string;
   title: string;
   description: string;
   startTime: string;
@@ -27,6 +28,7 @@ function App() {
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<HomePage />} />
+            <Route path="/event-details" element={<EventDetails />} />
             <Route
               path="/create-event"
               element={

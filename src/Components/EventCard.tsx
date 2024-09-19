@@ -7,14 +7,20 @@ import {
 } from "@mui/material";
 import { AppEvent } from "../App";
 import dayjs from "dayjs";
+import { useNavigate } from "react-router-dom";
 
 interface EventCardProps {
   event: AppEvent;
 }
 
 const EventCard: React.FC<EventCardProps> = ({ event }) => {
+  const navigate = useNavigate();
+  const handleEventCardClick = () => {
+    navigate("/event-details", { state: { event } });
+  };
+
   return (
-    <CardActionArea>
+    <CardActionArea onClick={handleEventCardClick}>
       <Card>
         <CardMedia
           className="h-36"
