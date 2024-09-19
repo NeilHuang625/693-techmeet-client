@@ -5,6 +5,7 @@ import { deepOrange } from "@mui/material/colors";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import LocationOnOutlinedIcon from "@mui/icons-material/LocationOnOutlined";
 import dayjs from "dayjs";
+import Footer from "../Components/Footer";
 
 const EventDetails = () => {
   const location = useLocation();
@@ -87,9 +88,16 @@ const EventDetails = () => {
         {/* attend bar */}
         <div className="sticky bottom-0 bg-white">
           <div className="w-full flex justify-center py-8">
-            <div className="w-3/4">hellp</div>
+            <div className="w-3/4 grid grid-cols-7 gap-2">
+              <div className="col-span-4">
+                <Typography>
+                  {dayjs(event.startTime).format("ddd, MMM D · HH:mm")}
+                </Typography>
+              </div>
+            </div>
           </div>
         </div>
+        <Footer />
       </div>
     </>
   );

@@ -2,6 +2,7 @@ import NavBar from "../Components/NavBar";
 import EventSlide from "../Components/EventSlide";
 import FilterBar from "../Components/FilterBar";
 import EventContainer from "../Components/EventContainer";
+import Footer from "../Components/Footer";
 import { getAllEvents } from "../Utils/API";
 import { createContext, useContext, useEffect, useState } from "react";
 import dayjs from "dayjs";
@@ -160,6 +161,7 @@ const HomePage = () => {
           handleFilterClick={handleFilterClick}
         />
         <EventContainer events={events} />
+        <Footer />
       </div>
     </HomePageContext.Provider>
   );
