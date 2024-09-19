@@ -12,7 +12,7 @@ const EventDetails = () => {
   return (
     <>
       <NavBar />
-      <div className="flex flex-col min-h-screen justify-center">
+      <div className="relative flex flex-col min-h-screen justify-center">
         <Paper elevation={3} className="flex justify-center w-full py-7 mb-1">
           <div className="w-3/4">
             <Typography
@@ -44,7 +44,7 @@ const EventDetails = () => {
             </div>
           </div>
         </Paper>
-        <div className=" flex justify-center bg-slate-100 ">
+        <div className="flex-grow flex justify-center bg-slate-100 ">
           <div className="w-3/4 grid grid-cols-3 gap-10 my-10">
             <div className="col-span-2">
               <img
@@ -85,8 +85,10 @@ const EventDetails = () => {
           </div>
         </div>
         {/* attend bar */}
-        <div className="mt-auto w-full flex justify-center my-8">
-          <div className="w-3/4">hellp</div>
+        <div className="sticky bottom-0 bg-white">
+          <div className="w-full flex justify-center py-8">
+            <div className="w-3/4">hellp</div>
+          </div>
         </div>
       </div>
     </>
