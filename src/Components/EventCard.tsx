@@ -31,7 +31,7 @@ const EventCard: React.FC<EventCardProps> = ({ event }) => {
         <CardContent>
           <Typography
             gutterBottom
-            variant="body1"
+            variant="body2"
             component="div"
             style={{
               display: "-webkit-box",
@@ -39,6 +39,7 @@ const EventCard: React.FC<EventCardProps> = ({ event }) => {
               WebkitBoxOrient: "vertical",
               overflow: "hidden",
               textOverflow: "ellipsis",
+              height: "3em",
             }}
           >
             {event.title}

@@ -392,6 +392,12 @@ const AccountMenu = () => {
           </ListItemIcon>
           Logout
         </MenuItem>
+        <MenuItem onClick={handleLogout}>
+          <ListItemIcon>
+            <Logout fontSize="small" />
+          </ListItemIcon>
+          Logout
+        </MenuItem>
       </Menu>
     </>
   );
