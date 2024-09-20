@@ -337,15 +337,17 @@ const AccountMenu = () => {
           <VisibilityIcon fontSize="inherit" />
           Events Attended
         </MenuItem>
-        <MenuItem
-          onClick={() => {
-            handleClose();
-            navigate("/edit-events");
-          }}
-        >
-          <EditIcon fontSize="inherit" />
-          Events Posted
-        </MenuItem>
+        {user?.roles && ["vip", "admin"].includes(user.roles) && (
+          <MenuItem
+            onClick={() => {
+              handleClose();
+              navigate("/edit-events");
+            }}
+          >
+            <EditIcon fontSize="inherit" />
+            Events Posted
+          </MenuItem>
+        )}
       </Menu>
       <Menu
         anchorEl={anchorEl}

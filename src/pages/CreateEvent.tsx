@@ -3,6 +3,9 @@ import PromotePaymentDialog from "../Components/Dialogs/PromotePaymentDialog";
 import { useAuth } from "../Contexts/AuthProvider";
 import { getAllCategories, createEvent } from "../Utils/API";
 import { usePlacesWidget } from "react-google-autocomplete";
+import ReactQuill from "react-quill";
+import "react-quill/dist/quill.snow.css";
+import "./react-quill-form.css";
 import {
   InputLabel,
   Button,
@@ -344,27 +347,24 @@ const CreateEvent = () => {
                 <InputLabel className="w-[108px]" htmlFor="description">
                   Description
                 </InputLabel>
-                <TextField
-                  className="w-3/4 min-h-[7rem]"
-                  id="description"
-                  size="small"
-                  name="description"
-                  label="Description"
-                  value={createEventForm.values.description}
-                  onChange={createEventForm.handleChange}
-                  error={
-                    createEventForm.touched.description &&
-                    Boolean(createEventForm.errors.description)
-                  }
-                  helperText={
-                    createEventForm.touched.description &&
-                    createEventForm.errors.description
-                  }
-                  variant="outlined"
-                  multiline
-                  rows={3}
-                  margin="dense"
-                />
+                <div className="flex flex-col w-3/4">
+                  <ReactQuill
+                    theme="snow"
+                    className="react-quill-form h-[1rem] "
+                    id="description"
+                    value={createEventForm.values.description}
+                    onChange={(value) => {
+                      createEventForm.setFieldValue("description", value);
+                      createEventForm.validateField("description");
+                    }}
+                  />
+                  {createEventForm.touched.description &&
+                  createEventForm.errors.description ? (
+                    <div className="text-red-500 text-sm">
+                      {createEventForm.errors.description}
+                    </div>
+                  ) : null}
+                </div>
               </div>
               <div className="pl-32">
                 <FormControlLabel
@@ -378,7 +378,7 @@ const CreateEvent = () => {
                   }
                   label={
                     <>
-                      Pay and Promote this event (
+                      Promote this event (
                       <span
                         className={
                           createEventForm.values.promoted ? "text-red-500" : ""

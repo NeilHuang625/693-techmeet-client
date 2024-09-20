@@ -1,0 +1,5 @@
+.react-quill-form {
+  resize: vertical;
+  min-height: 200px;
+  overflow-y: auto;
+}

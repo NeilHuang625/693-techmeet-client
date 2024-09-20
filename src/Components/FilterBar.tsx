@@ -5,8 +5,8 @@ import DateSelect from "./DateSelect";
 
 const FilterBar = ({ cities, categoryCountsArray, handleFilterClick }) => {
   return (
-    <Paper elevation={4} className="flex items-center justify-center p-4 mt-2">
-      <div className="flex items-center justify-center space-x-6 ">
+    <Paper elevation={4} className="flex items-center justify-center py-4 mt-2">
+      <div className="w-4/5 flex items-center justify-center space-x-12 ">
         <CitySelect cities={cities} />
         <CategoryMultiSelect categoryCountsArray={categoryCountsArray} />
         <DateSelect />

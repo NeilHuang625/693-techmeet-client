@@ -1,4 +1,4 @@
-import { Avatar, Paper, Typography } from "@mui/material";
+import { Avatar, Button, Paper, Typography } from "@mui/material";
 import NavBar from "../Components/NavBar";
 import { useLocation } from "react-router-dom";
 import { deepOrange } from "@mui/material/colors";
@@ -6,6 +6,7 @@ import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import LocationOnOutlinedIcon from "@mui/icons-material/LocationOnOutlined";
 import dayjs from "dayjs";
 import Footer from "../Components/Footer";
+import DescriptionDisplay from "../Components/DescriptionDisplay";
 
 const EventDetails = () => {
   const location = useLocation();
@@ -54,8 +55,7 @@ const EventDetails = () => {
                 alt="event photo"
               />
               <div className="mt-6">
-                <Typography variant="h6">Event Details</Typography>
-                <Typography variant="body1">{event.description}</Typography>
+                <DescriptionDisplay description={event.description} />
               </div>
             </div>
             <div className="col-span-1">
@@ -87,12 +87,25 @@ const EventDetails = () => {
         </div>
         {/* attend bar */}
         <div className="sticky bottom-0 bg-white">
-          <div className="w-full flex justify-center py-8">
-            <div className="w-3/4 grid grid-cols-7 gap-2">
+          <div className="w-full flex justify-center py-3">
+            <div className="w-3/4 grid grid-cols-7 gap-2 items-center">
               <div className="col-span-4">
                 <Typography>
                   {dayjs(event.startTime).format("ddd, MMM D · HH:mm")}
                 </Typography>
+                <Typography style={{ fontWeight: "bold" }}>
+                  {event.title}
+                </Typography>
+              </div>
+              <div className="col-span-2">
+                <Typography>
+                  {event.maxAttendees - event.currentAttendees} spots left
+                </Typography>
+              </div>
+              <div className="col-span-1 text-right">
+                <Button color="error" variant="contained">
+                  Attend
+                </Button>
               </div>
             </div>
           </div>

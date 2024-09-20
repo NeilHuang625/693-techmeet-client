@@ -6,7 +6,7 @@ import Footer from "../Components/Footer";
 import { getAllEvents } from "../Utils/API";
 import { createContext, useContext, useEffect, useState } from "react";
 import dayjs from "dayjs";
-
+import utc from "dayjs-plugin-utc";
 export interface AppEvent {
   id: number;
   title: string;
@@ -17,6 +17,7 @@ export interface AppEvent {
   city: string;
   imageUrl: string;
   userId: string;
+  currentAttendees: number;
   maxAttendees: number;
   promoted: boolean;
   categoryId: number;
@@ -70,14 +71,19 @@ const HomePage = () => {
     new Date().toISOString().slice(0, 10)
   );
 
+  dayjs.extend(utc);
+
   useEffect(() => {
     const fetchEvents = async () => {
       try {
         const response = await getAllEvents();
         const eventsWithLocalTime = response.data.map((event) => ({
           ...event,
-          startTime: dayjs(event.startTime).format("YYYY-MM-DD HH:mm"),
-          endTime: dayjs(event.endTime).format("YYYY-MM-DD HH:mm"),
+          startTime: dayjs
+            .utc(event.startTime)
+            .local()
+            .format("YYYY-MM-DD HH:mm"),
+          endTime: dayjs.utc(event.endTime).local().format("YYYY-MM-DD HH:mm"),
         }));
         const promotedEvents = eventsWithLocalTime.filter(
           (event) => event.promoted
@@ -123,8 +129,8 @@ const HomePage = () => {
           ? selectedCategories.includes(event.category)
           : true;
       let radioMatch = true;
-      if (selectedRadio === "today") {
-        radioMatch = dayjs(event.startTime).isSame(dayjs(), "day");
+      if (selectedRadio === "all") {
+        radioMatch = true;
       } else if (selectedRadio === "within-this-week") {
         radioMatch = dayjs(event.startTime).isSame(dayjs(), "week");
       } else if (selectedRadio === "date") {
@@ -152,15 +158,17 @@ const HomePage = () => {
         allEvents,
       }}
     >
-      <div className="flex flex-col">
+      <div className="flex flex-col min-h-full">
         <NavBar />
-        <EventSlide promotedEvents={promotedEvents} />
-        <FilterBar
-          cities={cities}
-          categoryCountsArray={categoryCountsArray}
-          handleFilterClick={handleFilterClick}
-        />
-        <EventContainer events={events} />
+        <div className="flex-grow">
+          <EventSlide promotedEvents={promotedEvents} />
+          <FilterBar
+            cities={cities}
+            categoryCountsArray={categoryCountsArray}
+            handleFilterClick={handleFilterClick}
+          />
+          <EventContainer events={events} />
+        </div>
         <Footer />
       </div>
     </HomePageContext.Provider>

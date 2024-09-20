@@ -22,9 +22,9 @@ const DateSelect = () => {
           onChange={(e) => setSelectedRadio(e.target.value)}
         >
           <FormControlLabel
-            value="today"
-            control={<Radio size="small" />}
-            label="Today"
+            value="all"
+            control={<Radio size="small" defaultChecked />}
+            label="All"
           />
           <FormControlLabel
             value="within-this-week"
