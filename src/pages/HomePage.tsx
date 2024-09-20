@@ -167,7 +167,11 @@ const HomePage = () => {
             categoryCountsArray={categoryCountsArray}
             handleFilterClick={handleFilterClick}
           />
-          <EventContainer events={events} />
+          {events.length === 0 ? (
+            <div className="flex justify-center mt-5 ">No events found</div>
+          ) : (
+            <EventContainer events={events} />
+          )}
         </div>
         <Footer />
       </div>

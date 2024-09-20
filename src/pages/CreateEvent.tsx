@@ -23,6 +23,7 @@ import createEventValidationSchema from "../models/createEventValidationSchema";
 import { useFormik, FormikProvider, ErrorMessage } from "formik";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 const CreateEvent = () => {
   const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null);
@@ -68,6 +69,7 @@ const CreateEvent = () => {
       }
       await createEvent(formData, jwt);
       navigate("/events-posted");
+      toast.success("Event created successfully");
     } catch (err) {
       console.log(err);
     }

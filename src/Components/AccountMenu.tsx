@@ -8,6 +8,8 @@ import VisibilityIcon from "@mui/icons-material/Visibility";
 import CloseIcon from "@mui/icons-material/Close";
 import LoginIcon from "@mui/icons-material/Login";
 import AppRegistrationIcon from "@mui/icons-material/AppRegistration";
+import PersonOutlineIcon from "@mui/icons-material/PersonOutline";
+import { toast } from "react-toastify";
 import {
   Avatar,
   Button,
@@ -62,6 +64,7 @@ const AccountMenu = () => {
         localStorage.setItem("jwt", jwt);
         setOpenSignupDialog(false);
         resetForm();
+        toast.success("Signup successfully");
       } catch (err) {
         if (err.response && err.response.status === 400) {
           setErrors({ email: "Email alreday in use, try a new one" });
@@ -86,8 +89,8 @@ const AccountMenu = () => {
         setOpenLoginDialog(false);
         setJwt(jwt);
         setIsAuthenticated(true);
-
         resetForm();
+        toast.success("Login successfully");
       } catch (err) {
         if (err.response && err.response.status === 400) {
           setErrors({
@@ -117,6 +120,7 @@ const AccountMenu = () => {
         setIsAuthenticated(false);
         setUser(null);
         handleClose();
+        toast.success("Logout successfully");
       }
     } catch (err) {
       console.error("Logout failed", err);
@@ -386,11 +390,11 @@ const AccountMenu = () => {
         transformOrigin={{ horizontal: "right", vertical: "top" }}
         anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
       >
-        <MenuItem onClick={handleLogout}>
+        <MenuItem>
           <ListItemIcon>
-            <Logout fontSize="small" />
+            <PersonOutlineIcon fontSize="small" />
           </ListItemIcon>
-          Logout
+          {user?.email}
         </MenuItem>
         <MenuItem onClick={handleLogout}>
           <ListItemIcon>

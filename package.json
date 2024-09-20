@@ -28,6 +28,7 @@
     "react-google-autocomplete": "^2.7.3",
     "react-quill": "^2.0.0",
     "react-router-dom": "^6.26.1",
+    "react-toastify": "^10.0.5",
     "styled-components": "^6.1.12",
     "swiper": "^11.1.12",
     "yup": "^1.4.0"

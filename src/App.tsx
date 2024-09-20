@@ -7,6 +7,8 @@ import JwtTimeoutDialog from "./Components/Dialogs/JwtTimeoutDialog";
 import CreateEvent from "./pages/CreateEvent";
 import EventsPosted from "./pages/EventsPosted";
 import EventDetails from "./pages/EventDetails";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 export interface AppEvent {
   id: string;
@@ -24,6 +26,7 @@ function App() {
   return (
     <ThemeProvider>
       <AuthProvider>
+        <ToastContainer position="bottom-center" />
         <JwtTimeoutDialog />
         <BrowserRouter>
           <Routes>
