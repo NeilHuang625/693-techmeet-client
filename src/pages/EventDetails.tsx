@@ -13,7 +13,7 @@ import { useContext, useEffect, useState } from "react";
 
 const EventDetails = () => {
   const { eventId } = useParams();
-  const { allEvents, setAllEvents } = useContext(AppContext);
+  const { allEvents } = useContext(AppContext);
   const [isLoading, setIsLoading] = useState(true);
   const [event, setEvent] = useState(null);
 

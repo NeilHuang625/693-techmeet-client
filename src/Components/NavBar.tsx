@@ -13,6 +13,7 @@ import { useAuth } from "../Contexts/AuthProvider";
 import { AppContext } from "../App";
 import UpgradeDialog from "./Dialogs/UpgradeDialog";
 import PaymentDialog from "./Dialogs/PaymentDialog";
+import logo from "../assets/logo.jpeg";
 
 const NavBar = () => {
   const { theme, toggleTheme } = useTheme();
@@ -60,7 +61,7 @@ const NavBar = () => {
           >
             <img
               className="transition transform hover:scale-105"
-              src="src/assets/logo.jpeg"
+              src={logo}
               style={{
                 width: "90%",
                 height: "60px",

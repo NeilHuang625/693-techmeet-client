@@ -1,6 +1,7 @@
 import { Button, Divider } from "@mui/material";
 import { Typography } from "@mui/material";
 import { Link } from "react-router-dom";
+import logo from "../assets/logo.jpeg";
 
 const Footer = () => {
   return (
@@ -9,7 +10,7 @@ const Footer = () => {
         <div className="grid grid-cols-9 gap-1">
           <div className="col-span-6">
             <Link to="/">
-              <img src="/src/assets/logo.jpeg" className="w-[200px]" />
+              <img src={logo} className="w-[200px]" />
             </Link>
           </div>
           <div className="col-span-1 text-right">
