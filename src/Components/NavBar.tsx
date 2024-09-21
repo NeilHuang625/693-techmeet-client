@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Paper from "@mui/material/Paper";
 import InputBase from "@mui/material/InputBase";
@@ -10,14 +10,14 @@ import AccountMenu from "./AccountMenu";
 import ToggleThemeButton from "./ToggleThemeButton";
 import { useTheme } from "../Contexts/ThemeProvider";
 import { useAuth } from "../Contexts/AuthProvider";
-import { useHomePageContext } from "../pages/HomePage";
+import { AppContext } from "../App";
 import UpgradeDialog from "./Dialogs/UpgradeDialog";
 import PaymentDialog from "./Dialogs/PaymentDialog";
 
 const NavBar = () => {
   const { theme, toggleTheme } = useTheme();
   const { user, jwt, isAuthenticated } = useAuth();
-  const { setEvents, allEvents } = useHomePageContext();
+  const { setEvents, allEvents } = useContext(AppContext);
   const role = user?.roles;
   const [search, setSearch] = useState("");
   const [openUpgradeDialog, setOpenUpgradeDialog] = useState(false);

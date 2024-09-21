@@ -16,7 +16,7 @@ interface EventCardProps {
 const EventCard: React.FC<EventCardProps> = ({ event }) => {
   const navigate = useNavigate();
   const handleEventCardClick = () => {
-    navigate("/event-details", { state: { event } });
+    navigate(`/event-details/${event.id}`);
   };
 
   return (

@@ -3,170 +3,18 @@ import EventSlide from "../Components/EventSlide";
 import FilterBar from "../Components/FilterBar";
 import EventContainer from "../Components/EventContainer";
 import Footer from "../Components/Footer";
-import { getAllEvents } from "../Utils/API";
-import { createContext, useContext, useEffect, useState } from "react";
-import dayjs from "dayjs";
-import utc from "dayjs-plugin-utc";
-export interface AppEvent {
-  id: number;
-  title: string;
-  description: string;
-  startTime: string;
-  endTime: string;
-  location: string;
-  city: string;
-  imageUrl: string;
-  userId: string;
-  currentAttendees: number;
-  maxAttendees: number;
-  promoted: boolean;
-  categoryId: number;
-  category: string;
-}
+import { AppContext } from "../App";
+import { useContext } from "react";
 
-export interface HomePageContextType {
-  events: AppEvent[];
-  setEvents: (events: AppEvent[]) => void;
-  selectedCity: string;
-  setSelectedCity: (city: string) => void;
-  selectedCategories: string[];
-  setSelectedCategories: (categories: string[]) => void;
-  selectedRadio: string;
-  setSelectedRadio: (radio: string) => void;
-  selectedDate: string;
-  setSelectedDate: (date: string) => void;
-  allEvents: AppEvent[];
-}
-
-const HomePageContext = createContext<HomePageContextType>({
-  events: [],
-  setEvents: () => {},
-  selectedCity: "",
-  setSelectedCity: () => {},
-  selectedCategories: [],
-  setSelectedCategories: () => {},
-  selectedRadio: "",
-  setSelectedRadio: () => {},
-  selectedDate: "",
-  setSelectedDate: () => {},
-  allEvents: [],
-});
-
-export const useHomePageContext = () => {
-  return useContext(HomePageContext);
-};
-
-const HomePage = () => {
-  const [allEvents, setAllEvents] = useState<AppEvent[]>([]);
-  const [events, setEvents] = useState<AppEvent[]>([]);
-  const [promotedEvents, setPromotedEvents] = useState<AppEvent[]>([]);
-  const [cities, setCities] = useState<string[]>([]);
-  const [categoryCountsArray, setCategoryCountsArray] = useState<
-    { category: string; count: number }[]
-  >([]);
-  const [selectedCity, setSelectedCity] = useState<string>("");
-  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
-  const [selectedRadio, setSelectedRadio] = useState<string>("");
-  const [selectedDate, setSelectedDate] = useState<string>(
-    new Date().toISOString().slice(0, 10)
-  );
-
-  dayjs.extend(utc);
-
-  useEffect(() => {
-    const fetchEvents = async () => {
-      try {
-        const response = await getAllEvents();
-        const eventsWithLocalTime = response.data.map((event) => ({
-          ...event,
-          startTime: dayjs
-            .utc(event.startTime)
-            .local()
-            .format("YYYY-MM-DD HH:mm"),
-          endTime: dayjs.utc(event.endTime).local().format("YYYY-MM-DD HH:mm"),
-        }));
-        const promotedEvents = eventsWithLocalTime.filter(
-          (event) => event.promoted
-        );
-        const cities = Array.from(
-          new Set(eventsWithLocalTime.map((event) => event.city))
-        );
-
-        // Count the number of events in each category
-        const categoryCounts = eventsWithLocalTime.reduce((acc, event) => {
-          if (!acc[event.category]) {
-            acc[event.category] = 1;
-          } else {
-            acc[event.category] += 1;
-          }
-          return acc;
-        }, {});
-
-        const categoryCountsArray = Object.entries(categoryCounts).map(
-          ([key, value]) => ({ category: key, count: value })
-        );
-        setPromotedEvents(promotedEvents);
-        setEvents(eventsWithLocalTime);
-        setAllEvents(eventsWithLocalTime);
-        setCities(cities);
-        setCategoryCountsArray(categoryCountsArray);
-      } catch (err) {
-        console.log(err);
-      }
-    };
-    fetchEvents();
-  }, []);
-
-  const handleFilterClick = () => {
-    const filteredEvents = allEvents.filter((event) => {
-      const cityMatch = selectedCity
-        ? selectedCity === "All"
-          ? true
-          : event.city === selectedCity
-        : true;
-      const categoryMatch =
-        selectedCategories.length > 0
-          ? selectedCategories.includes(event.category)
-          : true;
-      let radioMatch = true;
-      if (selectedRadio === "all") {
-        radioMatch = true;
-      } else if (selectedRadio === "within-this-week") {
-        radioMatch = dayjs(event.startTime).isSame(dayjs(), "week");
-      } else if (selectedRadio === "date") {
-        radioMatch = dayjs(event.startTime).isSame(dayjs(selectedDate), "day");
-      }
-      return cityMatch && categoryMatch && radioMatch;
-    });
-    setEvents(filteredEvents);
-  };
-  console.log("events", events);
-
+const HomePage = ({ handleFilterClick }) => {
+  const { events } = useContext(AppContext);
   return (
-    <HomePageContext.Provider
-      value={{
-        events,
-        setEvents,
-        selectedCity,
-        setSelectedCity,
-        selectedCategories,
-        setSelectedCategories,
-        selectedRadio,
-        setSelectedRadio,
-        selectedDate,
-        setSelectedDate,
-        allEvents,
-      }}
-    >
+    <>
       <div className="flex flex-col min-h-full">
         <NavBar />
         <div className="flex-grow">
-          <EventSlide promotedEvents={promotedEvents} />
-          <FilterBar
-            cities={cities}
-            categoryCountsArray={categoryCountsArray}
-            handleFilterClick={handleFilterClick}
-          />
+          <EventSlide />
+          <FilterBar handleFilterClick={handleFilterClick} />
           {events.length === 0 ? (
             <div className="flex justify-center mt-5 ">No events found</div>
           ) : (
@@ -175,7 +23,7 @@ const HomePage = () => {
         </div>
         <Footer />
       </div>
-    </HomePageContext.Provider>
+    </>
   );
 };
 

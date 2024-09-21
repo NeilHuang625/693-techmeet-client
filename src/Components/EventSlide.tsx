@@ -4,8 +4,11 @@ import "swiper/css/navigation";
 import "swiper/css/pagination";
 import "./EventSlide.css";
 import { Autoplay, Navigation, Pagination } from "swiper/modules";
+import { AppContext } from "../App";
+import { useContext } from "react";
 
-const EventSlide = ({ promotedEvents }) => {
+const EventSlide = () => {
+  const { promotedEvents } = useContext(AppContext);
   return (
     <div className="mt-2">
       <Swiper

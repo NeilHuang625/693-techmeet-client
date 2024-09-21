@@ -1,8 +1,9 @@
 import { FormControl, InputLabel, MenuItem, Select } from "@mui/material";
-import { useHomePageContext } from "../pages/HomePage";
+import { AppContext } from "../App";
+import { useContext } from "react";
 
-const CitySelect = ({ cities }) => {
-  const { selectedCity, setSelectedCity } = useHomePageContext();
+const CitySelect = () => {
+  const { cities, selectedCity, setSelectedCity } = useContext(AppContext);
   return (
     <FormControl className="w-40" size="small">
       <InputLabel id="location">Location</InputLabel>

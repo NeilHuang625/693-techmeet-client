@@ -5,11 +5,12 @@ import {
   FormControlLabel,
   TextField,
 } from "@mui/material";
-import { useHomePageContext } from "../pages/HomePage";
+import { AppContext } from "../App";
+import { useContext } from "react";
 
 const DateSelect = () => {
   const { selectedRadio, setSelectedRadio, selectedDate, setSelectedDate } =
-    useHomePageContext();
+    useContext(AppContext);
 
   return (
     <div>
@@ -23,7 +24,7 @@ const DateSelect = () => {
         >
           <FormControlLabel
             value="all"
-            control={<Radio size="small" defaultChecked />}
+            control={<Radio size="small" />}
             label="All"
           />
           <FormControlLabel

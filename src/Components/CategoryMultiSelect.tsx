@@ -9,7 +9,8 @@ import {
   Select,
 } from "@mui/material";
 import { SelectChangeEvent } from "@mui/material/Select";
-import { useHomePageContext } from "../pages/HomePage";
+import { AppContext } from "../App";
+import { useContext } from "react";
 
 function getStyles(name: string, personName: readonly string[], theme: Theme) {
   return {
@@ -30,9 +31,10 @@ const MenuProps = {
   },
 };
 
-const CategoryMultiSelect = ({ categoryCountsArray }) => {
+const CategoryMultiSelect = () => {
   const theme = useTheme();
-  const { selectedCategories, setSelectedCategories } = useHomePageContext();
+  const { selectedCategories, setSelectedCategories, categoryCountsArray } =
+    useContext(AppContext);
 
   const handleChange = (
     event: SelectChangeEvent<typeof selectedCategories>

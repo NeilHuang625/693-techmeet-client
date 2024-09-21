@@ -3,12 +3,12 @@ import CategoryMultiSelect from "./CategoryMultiSelect";
 import CitySelect from "./CitySelect";
 import DateSelect from "./DateSelect";
 
-const FilterBar = ({ cities, categoryCountsArray, handleFilterClick }) => {
+const FilterBar = ({ handleFilterClick }) => {
   return (
     <Paper elevation={4} className="flex items-center justify-center py-4 mt-2">
       <div className="w-4/5 flex items-center justify-center space-x-12 ">
-        <CitySelect cities={cities} />
-        <CategoryMultiSelect categoryCountsArray={categoryCountsArray} />
+        <CitySelect />
+        <CategoryMultiSelect />
         <DateSelect />
         <Button
           onClick={handleFilterClick}
