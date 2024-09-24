@@ -6,6 +6,7 @@ import ProtectedRoute from "./Components/ProtectedRoute";
 import JwtTimeoutDialog from "./Components/Dialogs/JwtTimeoutDialog";
 import CreateEvent from "./pages/CreateEvent";
 import EventsPosted from "./pages/EventsPosted";
+import EventsAttending from "./pages/EventsAttending";
 import EventDetails from "./pages/EventDetails";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -139,7 +140,7 @@ function App() {
       }
     };
     fetchEvents();
-  }, [isLoading]);
+  }, [isLoading, isAuthenticated, jwt, user]);
 
   const handleFilterClick = () => {
     const filteredEvents = allEvents.filter((event) => {
@@ -213,6 +214,14 @@ function App() {
               element={
                 <ProtectedRoute>
                   <EventsPosted />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/events-attending"
+              element={
+                <ProtectedRoute>
+                  <EventsAttending />
                 </ProtectedRoute>
               }
             />

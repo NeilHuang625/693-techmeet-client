@@ -337,7 +337,12 @@ const AccountMenu = () => {
           </MenuItem>
         )}
 
-        <MenuItem>
+        <MenuItem
+          onClick={() => {
+            handleClose();
+            navigate("/events-attending");
+          }}
+        >
           <VisibilityIcon fontSize="inherit" />
           Events Attending
         </MenuItem>

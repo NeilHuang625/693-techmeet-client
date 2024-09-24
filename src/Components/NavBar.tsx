@@ -88,6 +88,7 @@ const NavBar = () => {
             }}
           >
             <InputBase
+              className="highlight-on-focus"
               sx={{ ml: 1, flex: 1 }}
               placeholder="Search Events"
               inputProps={{ "aria-label": "search events" }}
