@@ -339,7 +339,7 @@ const AccountMenu = () => {
 
         <MenuItem>
           <VisibilityIcon fontSize="inherit" />
-          Events Attended
+          Events Attending
         </MenuItem>
         {user?.roles && ["vip", "admin"].includes(user.roles) && (
           <MenuItem

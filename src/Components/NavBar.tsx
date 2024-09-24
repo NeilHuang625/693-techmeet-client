@@ -31,6 +31,7 @@ const NavBar = () => {
     );
     setEvents(filteredEvents);
     setSearch("");
+    navigate("/");
   };
 
   const handleUpgradeClick = () => {

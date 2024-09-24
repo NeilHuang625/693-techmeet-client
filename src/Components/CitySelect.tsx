@@ -6,12 +6,12 @@ const CitySelect = () => {
   const { cities, selectedCity, setSelectedCity } = useContext(AppContext);
   return (
     <FormControl className="w-40" size="small">
-      <InputLabel id="location">Location</InputLabel>
+      <InputLabel id="location">City</InputLabel>
       <Select
         labelId="location"
         id="location_select"
         value={selectedCity}
-        label="Location"
+        label="City"
         onChange={(e) => setSelectedCity(e.target.value)}
       >
         <MenuItem value="All">All</MenuItem>

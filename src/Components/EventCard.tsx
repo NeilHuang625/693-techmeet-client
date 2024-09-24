@@ -53,6 +53,7 @@ const EventCard: React.FC<EventCardProps> = ({ event }) => {
               WebkitBoxOrient: "vertical",
               overflow: "hidden",
               textOverflow: "ellipsis",
+              height: "3em",
             }}
           >
             {event.location}

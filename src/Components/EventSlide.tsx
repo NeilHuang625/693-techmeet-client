@@ -16,7 +16,7 @@ const EventSlide = () => {
         centeredSlides={true}
         slidesPerView={3}
         autoplay={{
-          delay: 4000,
+          delay: 3000,
           disableOnInteraction: false,
         }}
         pagination={{ clickable: true }}
@@ -24,7 +24,6 @@ const EventSlide = () => {
         loop={true}
         modules={[Autoplay, Navigation, Pagination]}
         onSlideChange={() => {}}
-        onSwiper={(swiper) => console.log(swiper)}
         className="mySwiperStyle"
       >
         {promotedEvents.map((event) => (

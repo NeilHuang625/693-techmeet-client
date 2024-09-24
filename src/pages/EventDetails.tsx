@@ -6,30 +6,78 @@ import LocationOnOutlinedIcon from "@mui/icons-material/LocationOnOutlined";
 import dayjs from "dayjs";
 import Footer from "../Components/Footer";
 import DescriptionDisplay from "../Components/DescriptionDisplay";
+import { useAuth } from "../Contexts/AuthProvider";
 
 import { useParams } from "react-router-dom";
 import { AppContext } from "../App";
 import { useContext, useEffect, useState } from "react";
+import Loading from "../Components/Loading";
+import checkIsPastEvent from "../Utils/CheckIsPastEvent";
+import { attendEvent } from "../Utils/API";
 
 const EventDetails = () => {
   const { eventId } = useParams();
-  const { allEvents } = useContext(AppContext);
+  const {
+    allEvents,
+    eventsAttending,
+    setEventsAttending,
+    eventsWaiting,
+    setAllEvents,
+  } = useContext(AppContext);
+  const { jwt, isAuthenticated } = useAuth();
   const [isLoading, setIsLoading] = useState(true);
-  const [event, setEvent] = useState(null);
+  const [event, setEvent] = useState({});
+  const [isAttending, setIsAttending] = useState(false);
+  const [isWaiting, setIsWaiting] = useState(false);
+  const [isFull, setIsFull] = useState(false);
+  const [isPastEvent, setIsPastEvent] = useState(false);
+
+  const checkIsAttendingEvent = (eventId: string) => {
+    return eventsAttending.some((event) => event.id === Number(eventId));
+  };
+
+  const checkIsWaitingEvent = (eventId: string) => {
+    return eventsWaiting.some((event) => event.id === Number(eventId));
+  };
 
   useEffect(() => {
     if (allEvents.length > 0) {
       const event = allEvents.find((event) => event.id === Number(eventId));
+      const isPastEvent = checkIsPastEvent(event);
+      const isFull = event.maxAttendees - event.currentAttendees === 0;
       setEvent(event);
+      setIsAttending(checkIsAttendingEvent(eventId));
+      setIsWaiting(checkIsWaitingEvent(eventId));
+      setIsFull(isFull);
+      setIsPastEvent(isPastEvent);
       setIsLoading(false);
     }
   }, [allEvents, eventId]);
+
+  const handleEventAttending = async (jwt: string, eventId: string) => {
+    try {
+      const response = await attendEvent(jwt, eventId);
+      if (response.status === 200) {
+        console.log("response", response);
+        setEventsAttending((pre) => [...pre, event]);
+        setAllEvents((pre) =>
+          pre.map((event) =>
+            event.id === Number(eventId)
+              ? { ...event, currentAttendees: response.data.currentAttendees }
+              : event
+          )
+        );
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   return (
     <>
       <NavBar />
       {isLoading ? (
-        <div>Loading...</div>
+        <Loading />
       ) : (
         <div className="relative flex flex-col min-h-screen justify-center">
           <Paper elevation={3} className="flex justify-center w-full py-7 mb-1">
@@ -122,9 +170,28 @@ const EventDetails = () => {
                   </Typography>
                 </div>
                 <div className="col-span-1 text-right">
-                  <Button color="error" variant="contained">
-                    Attend
-                  </Button>
+                  {isPastEvent ? (
+                    <Button color="error" variant="contained" disabled>
+                      Past Event
+                    </Button>
+                  ) : isAttending ? (
+                    <Button color="error" variant="contained">
+                      Withdraw
+                    </Button>
+                  ) : isFull ? (
+                    <Button color="error" variant="contained">
+                      Waitlist
+                    </Button>
+                  ) : (
+                    <Button
+                      color="error"
+                      variant="contained"
+                      disabled={isAuthenticated ? false : true}
+                      onClick={() => handleEventAttending(jwt, event.id)}
+                    >
+                      Attend
+                    </Button>
+                  )}
                 </div>
               </div>
             </div>

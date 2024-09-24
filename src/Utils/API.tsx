@@ -81,3 +81,29 @@ export const getAllEvents = async () => {
   const response = await axios.get(`${basicURL}/event`);
   return response;
 };
+
+// Get User's Attending EventId and Waiting EventId
+export const getUserEvents = async (jwt: string, userId: string) => {
+  const response = await axios.get(`${basicURL}/event/${userId}`, {
+    headers: {
+      Authorization: `Bearer ${jwt}`,
+      "Cache-Control": "no-cache",
+    },
+  });
+  return response;
+};
+
+// Attend Event
+export const attendEvent = async (jwt: string, eventId: string) => {
+  const response = await axios.post(
+    `${basicURL}/event/attend/${eventId}`,
+    {},
+    {
+      headers: {
+        Authorization: `Bearer ${jwt}`,
+        "Cache-Control": "no-cache",
+      },
+    }
+  );
+  return response;
+};
