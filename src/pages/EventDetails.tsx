@@ -17,13 +17,8 @@ import { attendEvent } from "../Utils/API";
 
 const EventDetails = () => {
   const { eventId } = useParams();
-  const {
-    allEvents,
-    eventsAttending,
-    setEventsAttending,
-    eventsWaiting,
-    setAllEvents,
-  } = useContext(AppContext);
+  const { allEvents, eventsAttending, eventsWaiting, setAllEvents } =
+    useContext(AppContext);
   const { jwt, isAuthenticated } = useAuth();
   const [isLoading, setIsLoading] = useState(true);
   const [event, setEvent] = useState({});
@@ -31,10 +26,6 @@ const EventDetails = () => {
   const [isWaiting, setIsWaiting] = useState(false);
   const [isFull, setIsFull] = useState(false);
   const [isPastEvent, setIsPastEvent] = useState(false);
-
-  const checkIsAttendingEvent = (eventId: string) => {
-    return eventsAttending.some((event) => event.id === Number(eventId));
-  };
 
   const checkIsWaitingEvent = (eventId: string) => {
     return eventsWaiting.some((event) => event.id === Number(eventId));
@@ -46,20 +37,22 @@ const EventDetails = () => {
       const isPastEvent = checkIsPastEvent(event);
       const isFull = event.maxAttendees - event.currentAttendees === 0;
       setEvent(event);
-      setIsAttending(checkIsAttendingEvent(eventId));
+      setIsAttending(
+        eventsAttending.some((event) => event.id === Number(eventId))
+      );
       setIsWaiting(checkIsWaitingEvent(eventId));
       setIsFull(isFull);
       setIsPastEvent(isPastEvent);
       setIsLoading(false);
     }
-  }, [allEvents, eventId]);
+  }, [allEvents, eventId, eventsAttending]);
 
   const handleEventAttending = async (jwt: string, eventId: string) => {
     try {
       const response = await attendEvent(jwt, eventId);
       if (response.status === 200) {
         console.log("response", response);
-        setEventsAttending((pre) => [...pre, event]);
+        // setEventsAttending((pre) => [...pre, event]);
         setAllEvents((pre) =>
           pre.map((event) =>
             event.id === Number(eventId)
@@ -116,6 +109,7 @@ const EventDetails = () => {
               <div className="col-span-2">
                 <img
                   className="object-cover"
+                  width="100%"
                   src={event.imageUrl}
                   alt="event photo"
                 />

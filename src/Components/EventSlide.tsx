@@ -6,8 +6,10 @@ import "./EventSlide.css";
 import { Autoplay, Navigation, Pagination } from "swiper/modules";
 import { AppContext } from "../App";
 import { useContext } from "react";
+import { useNavigate } from "react-router-dom";
 
 const EventSlide = () => {
+  const navigate = useNavigate();
   const { promotedEvents } = useContext(AppContext);
   return (
     <div className="mt-2">
@@ -27,10 +29,18 @@ const EventSlide = () => {
         className="mySwiperStyle"
       >
         {promotedEvents.map((event) => (
-          <SwiperSlide key={event.id}>
+          <SwiperSlide
+            key={event.id}
+            onClick={() => navigate(`/event-details/${event.id}`)}
+            className="hover:cursor-pointer "
+          >
             <div className="event-slide">
-              <img src={event.imageUrl} alt={event.title} />
-              <div className="event-slide-content">
+              <img
+                src={event.imageUrl}
+                alt={event.title}
+                className="transition transform hover:scale-105"
+              />
+              <div className="font-bold">
                 <h3>{event.title}</h3>
               </div>
             </div>

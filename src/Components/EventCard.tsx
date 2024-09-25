@@ -40,6 +40,7 @@ const EventCard: React.FC<EventCardProps> = ({ event }) => {
               overflow: "hidden",
               textOverflow: "ellipsis",
               height: "3em",
+              fontWeight: "bold",
             }}
           >
             {event.title}

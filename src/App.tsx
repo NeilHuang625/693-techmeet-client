@@ -91,56 +91,55 @@ function App() {
             .format("YYYY-MM-DD HH:mm"),
           endTime: dayjs.utc(event.endTime).local().format("YYYY-MM-DD HH:mm"),
         }));
-        const promotedEvents = eventsWithLocalTime.filter(
-          (event) => event.promoted
-        );
-        const cities = Array.from(
-          new Set(eventsWithLocalTime.map((event) => event.city))
-        );
-
-        // Count the number of events in each category
-        const categoryCounts = eventsWithLocalTime.reduce((acc, event) => {
-          if (!acc[event.category]) {
-            acc[event.category] = 1;
-          } else {
-            acc[event.category] += 1;
-          }
-          return acc;
-        }, {});
-
-        const categoryCountsArray = Object.entries(categoryCounts).map(
-          ([key, value]) => ({ category: key, count: value })
-        );
-
-        if (isAuthenticated) {
-          const eventsBasedOnUser = await getUserEvents(jwt, user?.id);
-          const eventsAttending = eventsWithLocalTime.filter((e) =>
-            eventsBasedOnUser.data.attendingEvents.includes(e.id)
-          );
-          const eventsWaiting = eventsWithLocalTime.filter((e) =>
-            eventsBasedOnUser.data.waitlistedEvents.includes(e.id)
-          );
-          setEventsAttending(eventsAttending);
-          setEventsWaiting(eventsWaiting);
-
-          // Get the events that created by the user
-          const eventsCreated = eventsWithLocalTime.filter(
-            (e) => e.userId === user?.id
-          );
-          setEventsCreated(eventsCreated);
-        }
-
-        setPromotedEvents(promotedEvents);
         setEvents(eventsWithLocalTime);
         setAllEvents(eventsWithLocalTime);
-        setCities(cities);
-        setCategoryCountsArray(categoryCountsArray);
       } catch (err) {
         console.log(err);
       }
     };
     fetchEvents();
   }, [isLoading, isAuthenticated, jwt, user]);
+
+  useEffect(() => {
+    const getPromotedEvents = allEvents.filter((event) => event.promoted);
+    setPromotedEvents(getPromotedEvents);
+    const getCities = Array.from(new Set(allEvents.map((event) => event.city)));
+    setCities(getCities);
+    const categoryCounts = allEvents.reduce((acc, event) => {
+      if (!acc[event.category]) {
+        acc[event.category] = 1;
+      } else {
+        acc[event.category] += 1;
+      }
+      return acc;
+    }, {});
+    const getCategoryCountsArray = Object.entries(categoryCounts).map(
+      ([key, value]) => ({ category: key, count: value })
+    );
+    setCategoryCountsArray(getCategoryCountsArray);
+    if (isAuthenticated) {
+      const fetchUserEvents = async () => {
+        try {
+          const eventsBasedOnUser = await getUserEvents(jwt, user?.id);
+          const eventsAttending = allEvents.filter((e) =>
+            eventsBasedOnUser.data.attendingEvents.includes(e.id)
+          );
+          const eventsWaiting = allEvents.filter((e) =>
+            eventsBasedOnUser.data.waitlistedEvents.includes(e.id)
+          );
+          setEventsAttending(eventsAttending);
+          setEventsWaiting(eventsWaiting);
+
+          // Get the events that created by the user
+          const eventsCreated = allEvents.filter((e) => e.userId === user?.id);
+          setEventsCreated(eventsCreated);
+        } catch (err) {
+          console.log(err);
+        }
+      };
+      fetchUserEvents();
+    }
+  }, [allEvents, isLoading, isAuthenticated, jwt, user]);
 
   const handleFilterClick = () => {
     const filteredEvents = allEvents.filter((event) => {
@@ -165,7 +164,6 @@ function App() {
     });
     setEvents(filteredEvents);
   };
-  console.log("events", events);
 
   return (
     <ThemeProvider>

@@ -18,7 +18,13 @@ import logo from "../assets/logo.jpeg";
 const NavBar = () => {
   const { theme, toggleTheme } = useTheme();
   const { user, jwt, isAuthenticated } = useAuth();
-  const { setEvents, allEvents } = useContext(AppContext);
+  const {
+    setEvents,
+    allEvents,
+    setSelectedCategories,
+    setSelectedCity,
+    setSelectedRadio,
+  } = useContext(AppContext);
   const role = user?.roles;
   const [search, setSearch] = useState("");
   const [openUpgradeDialog, setOpenUpgradeDialog] = useState(false);
@@ -57,7 +63,13 @@ const NavBar = () => {
             alignItems="center"
             justifyContent="center"
             paddingLeft={2}
-            onClick={() => navigate("/")}
+            onClick={() => {
+              setEvents(allEvents);
+              setSelectedCategories([]);
+              setSelectedCity("");
+              setSelectedRadio("");
+              navigate("/");
+            }}
             style={{ cursor: "pointer", width: "90%" }}
           >
             <img
@@ -108,7 +120,9 @@ const NavBar = () => {
         {isAuthenticated && role === "user" ? (
           <Grid size={2} container justifyContent="center">
             <Button
-              variant="outlined"
+              sx={{ borderRadius: "20px" }}
+              variant="contained"
+              color="info"
               onClick={() => setOpenUpgradeDialog(true)}
             >
               Upgrade to VIP
