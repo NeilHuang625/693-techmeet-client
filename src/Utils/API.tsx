@@ -107,3 +107,29 @@ export const attendEvent = async (jwt: string, eventId: string) => {
   );
   return response;
 };
+
+// Withdraw Event
+export const withdrawEvent = async (jwt: string, eventId: string) => {
+  const response = await axios.delete(`${basicURL}/event/withdraw/${eventId}`, {
+    headers: {
+      Authorization: `Bearer ${jwt}`,
+      "Cache-Control": "no-cache",
+    },
+  });
+  return response;
+};
+
+// Add to Waitlist
+export const addToWaitlist = async (jwt: string, eventId: string) => {
+  const response = await axios.post(
+    `${basicURL}/event/waitlist/${eventId}`,
+    {},
+    {
+      headers: {
+        Authorization: `Bearer ${jwt}`,
+        "Cache-Control": "no-cache",
+      },
+    }
+  );
+  return response;
+};

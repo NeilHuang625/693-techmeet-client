@@ -13,12 +13,18 @@ import { AppContext } from "../App";
 import { useContext, useEffect, useState } from "react";
 import Loading from "../Components/Loading";
 import checkIsPastEvent from "../Utils/CheckIsPastEvent";
-import { attendEvent } from "../Utils/API";
+import { attendEvent, withdrawEvent, addToWaitlist } from "../Utils/API";
+import { toast } from "react-toastify";
 
 const EventDetails = () => {
   const { eventId } = useParams();
-  const { allEvents, eventsAttending, eventsWaiting, setAllEvents } =
-    useContext(AppContext);
+  const {
+    allEvents,
+    eventsAttending,
+    eventsWaiting,
+    setEventsWaiting,
+    setAllEvents,
+  } = useContext(AppContext);
   const { jwt, isAuthenticated } = useAuth();
   const [isLoading, setIsLoading] = useState(true);
   const [event, setEvent] = useState({});
@@ -26,10 +32,6 @@ const EventDetails = () => {
   const [isWaiting, setIsWaiting] = useState(false);
   const [isFull, setIsFull] = useState(false);
   const [isPastEvent, setIsPastEvent] = useState(false);
-
-  const checkIsWaitingEvent = (eventId: string) => {
-    return eventsWaiting.some((event) => event.id === Number(eventId));
-  };
 
   useEffect(() => {
     if (allEvents.length > 0) {
@@ -40,19 +42,18 @@ const EventDetails = () => {
       setIsAttending(
         eventsAttending.some((event) => event.id === Number(eventId))
       );
-      setIsWaiting(checkIsWaitingEvent(eventId));
+      setIsWaiting(eventsWaiting.some((event) => event.id === Number(eventId)));
       setIsFull(isFull);
       setIsPastEvent(isPastEvent);
       setIsLoading(false);
     }
-  }, [allEvents, eventId, eventsAttending]);
+  }, [allEvents, eventId, eventsAttending, eventsWaiting]);
 
   const handleEventAttending = async (jwt: string, eventId: string) => {
     try {
       const response = await attendEvent(jwt, eventId);
       if (response.status === 200) {
-        console.log("response", response);
-        // setEventsAttending((pre) => [...pre, event]);
+        toast.success("Event attended successfully");
         setAllEvents((pre) =>
           pre.map((event) =>
             event.id === Number(eventId)
@@ -63,6 +64,36 @@ const EventDetails = () => {
       }
     } catch (error) {
       console.error(error);
+    }
+  };
+
+  const handleWithdraw = async (jwt: string, eventId: string) => {
+    try {
+      const response = await withdrawEvent(jwt, eventId);
+      if (response.status === 200) {
+        toast.success("Event withdrawn successfully");
+        setAllEvents((pre) =>
+          pre.map((event) =>
+            event.id === Number(eventId)
+              ? { ...event, currentAttendees: response.data.currentAttendees }
+              : event
+          )
+        );
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handleWaitlist = async (jwt: string, eventId: string) => {
+    try {
+      const response = await addToWaitlist(jwt, eventId);
+      if (response.status === 200) {
+        toast.success("Event added to waitlist successfully");
+        setEventsWaiting((pre) => [...pre, event]);
+      }
+    } catch (err) {
+      console.error(err);
     }
   };
 
@@ -158,24 +189,42 @@ const EventDetails = () => {
                     {event.title}
                   </Typography>
                 </div>
-                <div className="col-span-2">
+                <div className="col-span-1">
                   <Typography>
                     {event.maxAttendees - event.currentAttendees} spots left
                   </Typography>
                 </div>
-                <div className="col-span-1 text-right">
+                <div className="col-span-2 text-right">
                   {isPastEvent ? (
                     <Button color="error" variant="contained" disabled>
                       Past Event
                     </Button>
                   ) : isAttending ? (
-                    <Button color="error" variant="contained">
+                    <Button
+                      color="error"
+                      variant="contained"
+                      onClick={() => handleWithdraw(jwt, event.id)}
+                    >
                       Withdraw
                     </Button>
                   ) : isFull ? (
-                    <Button color="error" variant="contained">
-                      Waitlist
-                    </Button>
+                    isWaiting ? (
+                      <Button
+                        color="warning"
+                        variant="contained"
+                        onClick={() => handleWaitlist(jwt, eventId)}
+                      >
+                        You are on the waitlist
+                      </Button>
+                    ) : (
+                      <Button
+                        color="error"
+                        variant="contained"
+                        onClick={() => handleWaitlist(jwt, eventId)}
+                      >
+                        Add Waitlist
+                      </Button>
+                    )
                   ) : (
                     <Button
                       color="error"
