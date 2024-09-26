@@ -31,7 +31,7 @@ const EventCard: React.FC<EventCardProps> = ({ event }) => {
         <CardContent>
           <Typography
             gutterBottom
-            variant="body2"
+            variant="body1"
             component="div"
             style={{
               display: "-webkit-box",

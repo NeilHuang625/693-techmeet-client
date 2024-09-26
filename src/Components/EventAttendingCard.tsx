@@ -28,7 +28,6 @@ const EventAttendingCard = ({ event }) => {
     >
       <Typography variant="h5">
         {dayjs(event.startTime).format("dddd D MMMM")}
-        {isPastEvent}
       </Typography>
       <div className="my-1">
         <Divider />
