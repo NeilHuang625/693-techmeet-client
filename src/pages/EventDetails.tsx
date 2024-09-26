@@ -24,6 +24,7 @@ const EventDetails = () => {
     eventsWaiting,
     setEventsWaiting,
     setAllEvents,
+    setOpenLoginDialog,
   } = useContext(AppContext);
   const { jwt, isAuthenticated } = useAuth();
   const [isLoading, setIsLoading] = useState(true);
@@ -39,10 +40,17 @@ const EventDetails = () => {
       const isPastEvent = checkIsPastEvent(event);
       const isFull = event.maxAttendees - event.currentAttendees === 0;
       setEvent(event);
-      setIsAttending(
-        eventsAttending.some((event) => event.id === Number(eventId))
-      );
-      setIsWaiting(eventsWaiting.some((event) => event.id === Number(eventId)));
+      if (isAuthenticated) {
+        setIsAttending(
+          eventsAttending.some((event) => event.id === Number(eventId))
+        );
+        setIsWaiting(
+          eventsWaiting.some((event) => event.id === Number(eventId))
+        );
+      } else {
+        setIsAttending(false);
+        setIsWaiting(false);
+      }
       setIsFull(isFull);
       setIsPastEvent(isPastEvent);
       setIsLoading(false);
@@ -229,8 +237,13 @@ const EventDetails = () => {
                     <Button
                       color="error"
                       variant="contained"
-                      disabled={isAuthenticated ? false : true}
-                      onClick={() => handleEventAttending(jwt, event.id)}
+                      onClick={() => {
+                        if (isAuthenticated) {
+                          handleEventAttending(jwt, event.id);
+                        } else {
+                          setOpenLoginDialog(true);
+                        }
+                      }}
                     >
                       Attend
                     </Button>

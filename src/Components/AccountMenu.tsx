@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import Logout from "@mui/icons-material/Logout";
@@ -28,6 +28,7 @@ import {
 import { useFormik } from "formik";
 import { signup, logout, login } from "../Utils/API";
 import { useAuth } from "../Contexts/AuthProvider";
+import { AppContext } from "../App";
 import signupValidationSchema from "../models/signupValidationSchema";
 import loginValidationSchema from "../models/loginValidationSchema";
 
@@ -35,13 +36,13 @@ const AccountMenu = () => {
   const navigate = useNavigate();
   const { isAuthenticated, setIsAuthenticated, user, setUser, setJwt } =
     useAuth();
+  const { openLoginDialog, setOpenLoginDialog } = useContext(AppContext);
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null); // for the Avatar Icon
   const [anchorEl2, setAnchorEl2] = useState<null | HTMLElement>(null); // for the custom button
   const open = Boolean(anchorEl);
 
   const [openSignupDialog, setOpenSignupDialog] = useState(false);
-  const [openLoginDialog, setOpenLoginDialog] = useState(false);
 
   // Signup form
   const formik = useFormik({
@@ -350,7 +351,7 @@ const AccountMenu = () => {
           <MenuItem
             onClick={() => {
               handleClose();
-              navigate("/edit-events");
+              navigate("/events-posted");
             }}
           >
             <EditIcon fontSize="inherit" />

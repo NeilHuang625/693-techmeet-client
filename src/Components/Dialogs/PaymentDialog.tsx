@@ -170,8 +170,9 @@ const PaymentDialog: React.FC<PaymentDialogProps> = ({ open, onClose }) => {
                 margin="normal"
               />
             </Stack>
-            <Button type="submit">Pay</Button>
+
             <Button
+              color="error"
               onClick={() => {
                 onClose();
                 paymentFormik.resetForm();
@@ -179,6 +180,7 @@ const PaymentDialog: React.FC<PaymentDialogProps> = ({ open, onClose }) => {
             >
               Cancel
             </Button>
+            <Button type="submit">Pay</Button>
           </form>
         </DialogContent>
       </Dialog>

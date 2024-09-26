@@ -60,9 +60,12 @@ const EventAttendingCard = ({ event }) => {
             {event.title}
           </Typography>
           <Typography variant="body2">{event.location}</Typography>
+          <Typography variant="body1">
+            {event.currentAttendees} attendees
+          </Typography>
           <Stack direction="row" alignItems="center" spacing={1}>
             {isPastEvent ? (
-              <RemoveCircleOutlineIcon color="disabled" />
+              <CheckCircleIcon color="disabled" />
             ) : isWaiting ? (
               <HourglassTopIcon color="warning" />
             ) : (
@@ -74,7 +77,7 @@ const EventAttendingCard = ({ event }) => {
               color="text.secondary"
             >
               {isPastEvent
-                ? "Past Event"
+                ? "Attended"
                 : isWaiting
                 ? "On the waitlist"
                 : "Attending"}

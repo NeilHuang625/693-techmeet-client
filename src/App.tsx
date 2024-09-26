@@ -53,6 +53,11 @@ export interface AppContextType {
   setEventsAttending: (events: AppEvent[]) => void;
   eventsWaiting: AppEvent[];
   setEventsWaiting: (events: AppEvent[]) => void;
+  eventsCreated: AppEvent[];
+  setEventsCreated: (events: AppEvent[]) => void;
+  openLoginDialog: boolean;
+  setOpenLoginDialog: (open: boolean) => void;
+  setUpdateAllEvents: (update: boolean) => void;
 }
 
 export const AppContext = createContext({} as AppContextType);
@@ -74,6 +79,8 @@ function App() {
   const [eventsAttending, setEventsAttending] = useState<AppEvent[]>([]); // Array of event IDs
   const [eventsWaiting, setEventsWaiting] = useState<AppEvent[]>([]); // Array of event IDs
   const [eventsCreated, setEventsCreated] = useState<AppEvent[]>([]);
+  const [openLoginDialog, setOpenLoginDialog] = useState(false);
+  const [updateAllEvents, setUpdateAllEvents] = useState(false);
 
   const { isAuthenticated, user, isLoading, jwt } = useAuth();
 
@@ -98,7 +105,7 @@ function App() {
       }
     };
     fetchEvents();
-  }, [isLoading, isAuthenticated, jwt, user]);
+  }, [isLoading, isAuthenticated, jwt, user, updateAllEvents]);
 
   useEffect(() => {
     const getPromotedEvents = allEvents.filter((event) => event.promoted);
@@ -139,7 +146,7 @@ function App() {
       };
       fetchUserEvents();
     }
-  }, [allEvents, isLoading, isAuthenticated, jwt, user]);
+  }, [allEvents, isLoading, isAuthenticated, jwt, user, updateAllEvents]);
 
   const handleFilterClick = () => {
     const filteredEvents = allEvents.filter((event) => {
@@ -191,6 +198,11 @@ function App() {
             setEventsAttending,
             eventsWaiting,
             setEventsWaiting,
+            eventsCreated,
+            setEventsCreated,
+            openLoginDialog,
+            setOpenLoginDialog,
+            setUpdateAllEvents,
           }}
         >
           <Routes>

@@ -1,6 +1,8 @@
 import NavBar from "../Components/NavBar";
 import PromotePaymentDialog from "../Components/Dialogs/PromotePaymentDialog";
 import { useAuth } from "../Contexts/AuthProvider";
+import { AppContext } from "../App";
+import { useContext } from "react";
 import { getAllCategories, createEvent } from "../Utils/API";
 import { usePlacesWidget } from "react-google-autocomplete";
 import ReactQuill from "react-quill";
@@ -34,6 +36,7 @@ const CreateEvent = () => {
     useState<boolean>(false);
   const [newEvent, setNewEvent] = useState<any>({});
   const { user, jwt } = useAuth();
+  const { setUpdateAllEvents } = useContext(AppContext);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -68,6 +71,7 @@ const CreateEvent = () => {
         throw new Error("JWT invalid");
       }
       await createEvent(formData, jwt);
+      setUpdateAllEvents((pre) => !pre);
       navigate("/events-posted");
       toast.success("Event created successfully");
     } catch (err) {

@@ -46,7 +46,7 @@ const EventCard: React.FC<EventCardProps> = ({ event }) => {
             {event.title}
           </Typography>
           <Typography
-            variant="body2"
+            variant="body1"
             color="text.secondary"
             style={{
               display: "-webkit-box",

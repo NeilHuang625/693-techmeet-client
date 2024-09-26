@@ -14,7 +14,7 @@ const EventsAttending = () => {
         <div className="w-1/2">
           <h1 className="text-2xl font-bold">Your Events</h1>
           {allEvents.length > 0 ? (
-            <div className="my-4">
+            <div className="my-8">
               {allEvents.map((event) => (
                 <EventAttendingCard event={event} key={event.id} />
               ))}
