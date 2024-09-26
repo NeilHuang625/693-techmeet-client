@@ -5,16 +5,17 @@ import { AppContext } from "../App";
 import { useContext } from "react";
 
 const EventsAttending = () => {
-  const { eventsAttending } = useContext(AppContext);
+  const { eventsAttending, eventsWaiting } = useContext(AppContext);
+  const allEvents = [...eventsAttending, ...eventsWaiting];
   return (
     <div className="flex flex-col min-h-screen">
       <NavBar />
       <div className="flex flex-grow flex-col items-center my-6">
         <div className="w-1/2">
           <h1 className="text-2xl font-bold">Your Events</h1>
-          {eventsAttending.length > 0 ? (
+          {allEvents.length > 0 ? (
             <div className="my-4">
-              {eventsAttending.map((event) => (
+              {allEvents.map((event) => (
                 <EventAttendingCard event={event} key={event.id} />
               ))}
             </div>
