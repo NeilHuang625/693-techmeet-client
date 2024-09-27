@@ -22,9 +22,9 @@ body {
 }
 
 .swiper-slide {
+  border-radius: 5px;
   text-align: center;
   font-size: 14px;
-  background: #fff;
 
   /* Center slide text vertically */
   display: flex;
@@ -37,4 +37,5 @@ body {
   width: 100%;
   height: 225px;
   object-fit: cover;
+  border-radius: 5px;
 }
