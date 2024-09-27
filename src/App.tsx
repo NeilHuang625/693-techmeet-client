@@ -5,6 +5,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import ProtectedRoute from "./Components/ProtectedRoute";
 import JwtTimeoutDialog from "./Components/Dialogs/JwtTimeoutDialog";
 import CreateEvent from "./pages/CreateEvent";
+import EditEvent from "./pages/EditEvent";
 import EventsPosted from "./pages/EventsPosted";
 import EventsAttending from "./pages/EventsAttending";
 import EventDetails from "./pages/EventDetails";
@@ -216,6 +217,14 @@ function App() {
               element={
                 <ProtectedRoute>
                   <CreateEvent />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/edit-event/:eventId"
+              element={
+                <ProtectedRoute>
+                  <EditEvent />
                 </ProtectedRoute>
               }
             />

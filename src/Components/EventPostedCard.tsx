@@ -42,6 +42,10 @@ const EventPostedCard = ({ event }) => {
     }
   };
 
+  const handleEditClick = () => {
+    navigate(`/edit-event/${event.id}`);
+  };
+
   return (
     <div className="flex flex-col w-full rounded-lg bg-white shadow-md hover:shadow-lg my-8">
       <div className="grid grid-cols-7">
@@ -77,6 +81,7 @@ const EventPostedCard = ({ event }) => {
         <div className="col-span-1  flex flex-col items-center justify-center">
           <Stack spacing={2}>
             <Button
+              onClick={handleEditClick}
               size="small"
               color="inherit"
               variant="contained"

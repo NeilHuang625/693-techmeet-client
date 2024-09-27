@@ -144,3 +144,14 @@ export const deleteEvent = async (jwt: string, eventId: string) => {
   });
   return response;
 };
+
+// Update Event
+export const updateEvent = async (jwt: string, eventId: any, event: any) => {
+  const response = await axios.put(`${basicURL}/event/${eventId}`, event, {
+    headers: {
+      Authorization: `Bearer ${jwt}`,
+      "Cache-Control": "no-cache",
+    },
+  });
+  return response;
+};

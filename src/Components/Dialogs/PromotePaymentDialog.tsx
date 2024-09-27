@@ -33,8 +33,8 @@ const PromotePaymentDialog: React.FC<PaymentDialogProps> = ({
     validationSchema: paymentFormValidationSchema,
     onSubmit: () => {
       onClose();
-      paymentFormik.resetForm();
       handleCreateEvent();
+      paymentFormik.resetForm();
     },
   });
 

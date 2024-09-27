@@ -3,7 +3,7 @@ import PromotePaymentDialog from "../Components/Dialogs/PromotePaymentDialog";
 import { useAuth } from "../Contexts/AuthProvider";
 import { AppContext } from "../App";
 import { useContext } from "react";
-import { getAllCategories, createEvent } from "../Utils/API";
+import { getAllCategories, updateEvent } from "../Utils/API";
 import { usePlacesWidget } from "react-google-autocomplete";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
@@ -21,14 +21,15 @@ import {
   Checkbox,
   MenuItem,
 } from "@mui/material";
-import createEventValidationSchema from "../models/createEventValidationSchema";
+import EditEventValidationSchema from "../models/EditEventValidationSchema";
 import { useFormik, FormikProvider, ErrorMessage } from "formik";
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import Footer from "../Components/Footer";
 
-const CreateEvent = () => {
+const EditEvent = () => {
+  const { eventId } = useParams();
   const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null);
   const [categories, setCategories] = useState<{ id: string; name: string }[]>(
     []
@@ -36,26 +37,22 @@ const CreateEvent = () => {
   const [promotePaymentDialogOpen, setPromotePaymentDialogOpen] =
     useState<boolean>(false);
   const [newEvent, setNewEvent] = useState<any>({});
-  const { user, jwt } = useAuth();
-  const { setUpdateAllEvents } = useContext(AppContext);
+  const [event, setEvent] = useState<any>();
+  const { jwt } = useAuth();
+  const { setUpdateAllEvents, allEvents } = useContext(AppContext);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        const response = await getAllCategories();
-        setCategories(response.data);
-      } catch (err) {
-        console.log(err);
-      }
-    };
-    fetchCategories();
-  }, []);
-
-  const handleCreateEvent = async (newEvent: any) => {
-    const userId = user?.id;
+  const handleUpdateEvent = async (newEvent: any) => {
     const formData = new FormData();
-    formData.append("UserId", userId as string);
+
+    // Object.keys(newEvent).forEach((key) => {
+    //   let value = newEvent[key];
+    //   if (typeof value !== "string" && !(value instanceof File)) {
+    //     value = value.toString();
+    //   }
+    //   formData.append(key, value);
+    // });
+
     formData.append("Title", newEvent.title);
     formData.append("StartTime", newEvent.startTime);
     formData.append("EndTime", newEvent.endTime);
@@ -68,19 +65,18 @@ const CreateEvent = () => {
     formData.append("ImageFile", newEvent.imageFile as File);
 
     try {
-      if (!jwt) {
-        throw new Error("JWT invalid");
+      const response = await updateEvent(jwt, event.id, formData);
+      if (response.status === 200) {
+        setUpdateAllEvents((pre) => !pre);
+        navigate("/events-posted");
+        toast.success("Event created successfully");
       }
-      await createEvent(formData, jwt);
-      setUpdateAllEvents((pre) => !pre);
-      navigate("/events-posted");
-      toast.success("Event created successfully");
     } catch (err) {
       console.log(err);
     }
   };
 
-  const createEventForm = useFormik({
+  const editEventForm = useFormik({
     initialValues: {
       title: "",
       startTime: "",
@@ -89,25 +85,50 @@ const CreateEvent = () => {
       maxAttendees: 0,
       location: "",
       category: "",
-      imageFile: null,
+      imageFile: undefined,
+      imageUrl: "",
       promoted: false,
       city: "",
     },
-    validationSchema: createEventValidationSchema,
-    onSubmit: async (newEvent) => {
-      if (!jwt) {
-        alert("You need to login to create an event");
-        return;
-      }
-      setNewEvent(newEvent);
-
-      if (createEventForm.values.promoted) {
+    validationSchema: EditEventValidationSchema,
+    onSubmit: (updatedEvent) => {
+      setNewEvent(updatedEvent);
+      if (editEventForm.values.promoted && event.promoted === false) {
         setPromotePaymentDialogOpen(true);
-      } else {
-        await handleCreateEvent(newEvent);
       }
+      handleUpdateEvent(updatedEvent);
     },
   });
+
+  useEffect(() => {
+    const event = allEvents.find((event) => event.id === Number(eventId));
+    if (event) {
+      setImagePreviewUrl(event.imageUrl);
+      setEvent(event);
+      editEventForm.setValues({
+        title: event.title,
+        startTime: event.startTime,
+        endTime: event.endTime,
+        description: event.description,
+        maxAttendees: event.maxAttendees,
+        location: event.location,
+        category: event.categoryId.toString(),
+        imageFile: undefined,
+        imageUrl: event.imageUrl,
+        promoted: event.promoted,
+        city: event.city,
+      });
+    }
+    const fetchCategories = async () => {
+      try {
+        const response = await getAllCategories();
+        setCategories(response.data);
+      } catch (err) {
+        console.log(err);
+      }
+    };
+    fetchCategories();
+  }, [allEvents, eventId]);
 
   const { ref } = usePlacesWidget({
     apiKey: import.meta.env.VITE_GOOGLE_API_KEY,
@@ -116,8 +137,8 @@ const CreateEvent = () => {
         component.types.includes("locality")
       ).long_name;
       const address = place.formatted_address;
-      createEventForm.setFieldValue("location", address);
-      createEventForm.setFieldValue("city", city);
+      editEventForm.setFieldValue("location", address);
+      editEventForm.setFieldValue("city", city);
     },
     options: {
       types: ["address"],
@@ -130,20 +151,27 @@ const CreateEvent = () => {
       <PromotePaymentDialog
         open={promotePaymentDialogOpen}
         onClose={() => setPromotePaymentDialogOpen(false)}
-        handleCreateEvent={() => handleCreateEvent(newEvent)}
+        handleCreateEvent={() => handleUpdateEvent(newEvent)}
       />
-      <FormikProvider value={createEventForm}>
+      <FormikProvider value={editEventForm}>
         <NavBar />
         <div className=" flex justify-center items-center mt-4 pb-8">
           <div className="w-3/5 ">
             <p className="text-xl text-white h-10 bg-gray-400 flex justify-center items-center">
-              Create New Event
+              Update Event
             </p>
             <form
-              onSubmit={createEventForm.handleSubmit}
+              onSubmit={editEventForm.handleSubmit}
               className="w-5/6 mx-auto mt-3"
             >
               <div className="flex items-center space-x-5 ">
+                <input
+                  type="text"
+                  hidden
+                  name="imageUrl"
+                  value={editEventForm.values.imageUrl}
+                  onChange={editEventForm.handleChange}
+                />
                 <InputLabel
                   className="w-[108px] flex items-center"
                   htmlFor="imageFile"
@@ -158,13 +186,18 @@ const CreateEvent = () => {
                   onChange={(e) => {
                     const target = e.currentTarget as HTMLInputElement;
                     const file: File = (target.files as FileList)[0];
-                    createEventForm.setFieldValue("imageFile", file);
-                    const url = URL.createObjectURL(file);
-                    setImagePreviewUrl(url);
+                    if (file) {
+                      editEventForm.setFieldValue("imageFile", file);
+                      const url = URL.createObjectURL(file);
+                      setImagePreviewUrl(url);
+                    } else {
+                      editEventForm.setFieldValue("imageFile", undefined);
+                      setImagePreviewUrl(event?.imageUrl);
+                    }
                   }}
                   error={
-                    createEventForm.touched.imageFile &&
-                    Boolean(createEventForm.errors.imageFile)
+                    editEventForm.touched.imageFile &&
+                    Boolean(editEventForm.errors.imageFile)
                   }
                 ></Input>
                 <div className="flex-4">
@@ -203,15 +236,14 @@ const CreateEvent = () => {
                   id="title"
                   name="title"
                   label="Event Title"
-                  value={createEventForm.values.title}
-                  onChange={createEventForm.handleChange}
+                  value={editEventForm.values.title}
+                  onChange={editEventForm.handleChange}
                   error={
-                    createEventForm.touched.title &&
-                    Boolean(createEventForm.errors.title)
+                    editEventForm.touched.title &&
+                    Boolean(editEventForm.errors.title)
                   }
                   helperText={
-                    createEventForm.touched.title &&
-                    createEventForm.errors.title
+                    editEventForm.touched.title && editEventForm.errors.title
                   }
                   variant="outlined"
                   margin="dense"
@@ -228,15 +260,15 @@ const CreateEvent = () => {
                   id="location"
                   name="location"
                   label="Location"
-                  value={createEventForm.values.location}
-                  onChange={createEventForm.handleChange}
+                  value={editEventForm.values.location}
+                  onChange={editEventForm.handleChange}
                   error={
-                    createEventForm.touched.location &&
-                    Boolean(createEventForm.errors.location)
+                    editEventForm.touched.location &&
+                    Boolean(editEventForm.errors.location)
                   }
                   helperText={
-                    createEventForm.touched.location &&
-                    createEventForm.errors.location
+                    editEventForm.touched.location &&
+                    editEventForm.errors.location
                   }
                   variant="outlined"
                   margin="dense"
@@ -254,15 +286,15 @@ const CreateEvent = () => {
                   id="startTime"
                   name="startTime"
                   label="Start Time"
-                  value={createEventForm.values.startTime}
-                  onChange={createEventForm.handleChange}
+                  value={editEventForm.values.startTime}
+                  onChange={editEventForm.handleChange}
                   error={
-                    createEventForm.touched.startTime &&
-                    Boolean(createEventForm.errors.startTime)
+                    editEventForm.touched.startTime &&
+                    Boolean(editEventForm.errors.startTime)
                   }
                   helperText={
-                    createEventForm.touched.startTime &&
-                    createEventForm.errors.startTime
+                    editEventForm.touched.startTime &&
+                    editEventForm.errors.startTime
                   }
                   variant="outlined"
                   margin="dense"
@@ -275,15 +307,15 @@ const CreateEvent = () => {
                   id="endTime"
                   name="endTime"
                   label="End Time"
-                  value={createEventForm.values.endTime}
-                  onChange={createEventForm.handleChange}
+                  value={editEventForm.values.endTime}
+                  onChange={editEventForm.handleChange}
                   error={
-                    createEventForm.touched.endTime &&
-                    Boolean(createEventForm.errors.endTime)
+                    editEventForm.touched.endTime &&
+                    Boolean(editEventForm.errors.endTime)
                   }
                   helperText={
-                    createEventForm.touched.endTime &&
-                    createEventForm.errors.endTime
+                    editEventForm.touched.endTime &&
+                    editEventForm.errors.endTime
                   }
                   variant="outlined"
                   margin="dense"
@@ -299,15 +331,15 @@ const CreateEvent = () => {
                   id="maxAttendees"
                   name="maxAttendees"
                   label="Max Attendees"
-                  value={createEventForm.values.maxAttendees}
-                  onChange={createEventForm.handleChange}
+                  value={editEventForm.values.maxAttendees}
+                  onChange={editEventForm.handleChange}
                   error={
-                    createEventForm.touched.maxAttendees &&
-                    Boolean(createEventForm.errors.maxAttendees)
+                    editEventForm.touched.maxAttendees &&
+                    Boolean(editEventForm.errors.maxAttendees)
                   }
                   helperText={
-                    createEventForm.touched.maxAttendees &&
-                    createEventForm.errors.maxAttendees
+                    editEventForm.touched.maxAttendees &&
+                    editEventForm.errors.maxAttendees
                   }
                   variant="outlined"
                   margin="dense"
@@ -324,16 +356,16 @@ const CreateEvent = () => {
                   size="small"
                   margin="dense"
                   error={
-                    createEventForm.touched.category &&
-                    Boolean(createEventForm.errors.category)
+                    editEventForm.touched.category &&
+                    Boolean(editEventForm.errors.category)
                   }
                 >
                   <InputLabel htmlFor="category">Category</InputLabel>
                   <Select
                     id="category"
                     name="category"
-                    value={createEventForm.values.category}
-                    onChange={createEventForm.handleChange}
+                    value={editEventForm.values.category}
+                    onChange={editEventForm.handleChange}
                     label="category"
                   >
                     {categories.map((category) => (
@@ -342,10 +374,10 @@ const CreateEvent = () => {
                       </MenuItem>
                     ))}
                   </Select>
-                  {createEventForm.touched.category &&
-                    createEventForm.errors.category && (
+                  {editEventForm.touched.category &&
+                    editEventForm.errors.category && (
                       <FormHelperText>
-                        {createEventForm.errors.category}
+                        {editEventForm.errors.category}
                       </FormHelperText>
                     )}
                 </FormControl>
@@ -359,16 +391,16 @@ const CreateEvent = () => {
                     theme="snow"
                     className="react-quill-form h-[1rem] "
                     id="description"
-                    value={createEventForm.values.description}
+                    value={editEventForm.values.description}
                     onChange={(value) => {
-                      createEventForm.setFieldValue("description", value);
-                      createEventForm.validateField("description");
+                      editEventForm.setFieldValue("description", value);
+                      editEventForm.validateField("description");
                     }}
                   />
-                  {createEventForm.touched.description &&
-                  createEventForm.errors.description ? (
+                  {editEventForm.touched.description &&
+                  editEventForm.errors.description ? (
                     <div className="text-red-500 text-sm">
-                      {createEventForm.errors.description}
+                      {editEventForm.errors.description}
                     </div>
                   ) : null}
                 </div>
@@ -379,28 +411,33 @@ const CreateEvent = () => {
                     <Checkbox
                       id="promoted"
                       name="promoted"
-                      checked={createEventForm.values.promoted}
-                      onChange={createEventForm.handleChange}
+                      disabled={editEventForm.values.promoted}
+                      checked={editEventForm.values.promoted}
+                      onChange={editEventForm.handleChange}
                     />
                   }
                   label={
-                    <>
-                      Promote this event (
-                      <span
-                        className={
-                          createEventForm.values.promoted ? "text-red-500" : ""
-                        }
-                      >
-                        $NZD 5 charges apply
-                      </span>
-                      )
-                    </>
+                    event?.promoted ? (
+                      "Promoted"
+                    ) : (
+                      <>
+                        Promote this event (
+                        <span
+                          className={
+                            editEventForm.values.promoted ? "text-red-500" : ""
+                          }
+                        >
+                          $NZD 5 charges apply
+                        </span>
+                        )
+                      </>
+                    )
                   }
                 />
               </div>
               <div className="flex justify-end mt-3">
                 <Button variant="outlined" type="submit">
-                  Create
+                  Update
                 </Button>
               </div>
             </form>
@@ -412,4 +449,4 @@ const CreateEvent = () => {
   );
 };
 
-export default CreateEvent;
+export default EditEvent;
