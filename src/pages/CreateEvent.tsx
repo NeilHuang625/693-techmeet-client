@@ -357,7 +357,7 @@ const CreateEvent = () => {
                 <div className="flex flex-col w-3/4">
                   <ReactQuill
                     theme="snow"
-                    className="react-quill-form h-20"
+                    className="react-quill-form "
                     id="description"
                     value={createEventForm.values.description}
                     onChange={(value) => {
