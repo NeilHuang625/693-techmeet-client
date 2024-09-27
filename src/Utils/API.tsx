@@ -134,6 +134,17 @@ export const addToWaitlist = async (jwt: string, eventId: string) => {
   return response;
 };
 
+// Cancel Waitlist
+export const cancelWaitlist = async (jwt: string, eventId: string) => {
+  const response = await axios.delete(`${basicURL}/event/waitlist/${eventId}`, {
+    headers: {
+      Authorization: `Bearer ${jwt}`,
+      "Cache-Control": "no-cache",
+    },
+  });
+  return response;
+};
+
 // Delete Event
 export const deleteEvent = async (jwt: string, eventId: string) => {
   const response = await axios.delete(`${basicURL}/event/${eventId}`, {

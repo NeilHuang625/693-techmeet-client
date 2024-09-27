@@ -12,9 +12,17 @@ const FilterBar = ({ handleFilterClick }) => {
         <DateSelect />
         <Button
           onClick={handleFilterClick}
-          size="small"
-          variant="contained"
+          // size="small"
           color="inherit"
+          variant="contained"
+          sx={{
+            borderRadius: "20px",
+            backgroundColor: "inherit",
+            "&:hover": {
+              backgroundColor: "#ced4da",
+              color: "white",
+            },
+          }}
         >
           Apply
         </Button>

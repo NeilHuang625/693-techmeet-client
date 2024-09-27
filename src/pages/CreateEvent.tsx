@@ -177,7 +177,7 @@ const CreateEvent = () => {
                   ) : (
                     <Box
                       sx={{
-                        width: "200px",
+                        width: "260px",
                         height: "150px",
                         border: "1px dashed gray",
                         backgroundColor: "#e2e8f0",

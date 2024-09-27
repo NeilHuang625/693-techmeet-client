@@ -1,15 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
-import {
-  Button,
-  Stack,
-  Typography,
-  Dialog,
-  DialogActions,
-  DialogTitle,
-  DialogContent,
-  DialogContentText,
-} from "@mui/material";
+import { Button, Stack, Typography } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import { useAuth } from "../Contexts/AuthProvider";
@@ -18,6 +9,7 @@ import { deleteEvent } from "../Utils/API";
 import { toast } from "react-toastify";
 import { AppContext } from "../App";
 import { useContext } from "react";
+import ConfirmDialog from "./Dialogs/ConfirmDialog";
 
 const EventPostedCard = ({ event }) => {
   const navigate = useNavigate();
@@ -113,25 +105,14 @@ const EventPostedCard = ({ event }) => {
           </Stack>
         </div>
       </div>
-      <Dialog
+      <ConfirmDialog
         open={openDeleteDialog}
         onClose={() => setOpenDeleteDialog(false)}
-      >
-        <DialogTitle>{"Confirm Delete"}</DialogTitle>
-        <DialogContent>
-          <DialogContentText>
-            Are you sure you want to delete this event?
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setOpenDeleteDialog(false)} color="error">
-            Cancel
-          </Button>
-          <Button onClick={handleEventDelete} color="primary" autoFocus>
-            Delete
-          </Button>
-        </DialogActions>
-      </Dialog>
+        title="Confirm Delete"
+        message="Are you sure you want to delete this event?"
+        actionName="Yes"
+        action={handleEventDelete}
+      />
     </div>
   );
 };

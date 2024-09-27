@@ -390,15 +390,15 @@ const EditEvent = () => {
                       editEventForm.validateField("description");
                     }}
                   />
-                  {editEventForm.touched.description &&
-                  editEventForm.errors.description ? (
-                    <div className="text-red-500 text-sm">
-                      {editEventForm.errors.description}
-                    </div>
-                  ) : null}
+                  <div className="text-red-500 text-sm mt-12 ml-2">
+                    {editEventForm.touched.description &&
+                      editEventForm.errors.description && (
+                        <p>{editEventForm.errors.description}</p>
+                      )}
+                  </div>
                 </div>
               </div>
-              <div className="pl-32">
+              <div className="pl-32 mt-2">
                 <FormControlLabel
                   control={
                     <Checkbox
@@ -428,8 +428,8 @@ const EditEvent = () => {
                   }
                 />
               </div>
-              <div className="flex justify-end mt-3">
-                <Button variant="outlined" type="submit">
+              <div className="flex justify-center mt-3">
+                <Button color="error" variant="contained" type="submit">
                   Update
                 </Button>
               </div>

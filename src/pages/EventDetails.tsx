@@ -13,8 +13,14 @@ import { AppContext } from "../App";
 import { useContext, useEffect, useState } from "react";
 import Loading from "../Components/Loading";
 import checkIsPastEvent from "../Utils/CheckIsPastEvent";
-import { attendEvent, withdrawEvent, addToWaitlist } from "../Utils/API";
+import {
+  attendEvent,
+  withdrawEvent,
+  addToWaitlist,
+  cancelWaitlist,
+} from "../Utils/API";
 import { toast } from "react-toastify";
+import ConfirmDialog from "../Components/Dialogs/ConfirmDialog";
 
 const EventDetails = () => {
   const { eventId } = useParams();
@@ -33,6 +39,9 @@ const EventDetails = () => {
   const [isWaiting, setIsWaiting] = useState(false);
   const [isFull, setIsFull] = useState(false);
   const [isPastEvent, setIsPastEvent] = useState(false);
+  const [openWithdrawDialog, setOpenWithdrawDialog] = useState(false);
+  const [openCancelWaitlistDialog, setOpenCancelWaitlistDialog] =
+    useState(false);
 
   useEffect(() => {
     if (allEvents.length > 0) {
@@ -99,6 +108,18 @@ const EventDetails = () => {
       if (response.status === 200) {
         toast.success("Event added to waitlist successfully");
         setEventsWaiting((pre) => [...pre, event]);
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleCancelWaitlist = async (jwt: string, eventId: string) => {
+    try {
+      const response = await cancelWaitlist(jwt, eventId);
+      if (response.status === 200) {
+        toast.success("Waitlist cancelled successfully");
+        setEventsWaiting((pre) => pre.filter((e) => e.id !== Number(eventId)));
       }
     } catch (err) {
       console.error(err);
@@ -211,7 +232,7 @@ const EventDetails = () => {
                     <Button
                       color="error"
                       variant="contained"
-                      onClick={() => handleWithdraw(jwt, event.id)}
+                      onClick={() => setOpenWithdrawDialog(true)}
                     >
                       Withdraw
                     </Button>
@@ -220,7 +241,7 @@ const EventDetails = () => {
                       <Button
                         color="warning"
                         variant="contained"
-                        onClick={() => handleWaitlist(jwt, eventId)}
+                        onClick={() => setOpenCancelWaitlistDialog(true)}
                       >
                         You are on the waitlist
                       </Button>
@@ -255,6 +276,28 @@ const EventDetails = () => {
           <Footer />
         </div>
       )}
+      <ConfirmDialog
+        open={openWithdrawDialog}
+        onClose={() => setOpenWithdrawDialog(false)}
+        title="Withdraw from Event"
+        message="Are you sure you want to withdraw from this event?"
+        actionName="Yes"
+        action={() => {
+          handleWithdraw(jwt, event.id);
+          setOpenWithdrawDialog(false);
+        }}
+      />
+      <ConfirmDialog
+        open={openCancelWaitlistDialog}
+        onClose={() => setOpenCancelWaitlistDialog(false)}
+        title="Cancel Waitlist"
+        message="Are you sure you want to cancel the waitlist?"
+        actionName="Yes"
+        action={() => {
+          handleCancelWaitlist(jwt, event.id);
+          setOpenCancelWaitlistDialog(false);
+        }}
+      />
     </>
   );
 };
