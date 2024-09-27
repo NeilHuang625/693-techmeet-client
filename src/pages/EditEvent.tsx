@@ -45,14 +45,6 @@ const EditEvent = () => {
   const handleUpdateEvent = async (newEvent: any) => {
     const formData = new FormData();
 
-    // Object.keys(newEvent).forEach((key) => {
-    //   let value = newEvent[key];
-    //   if (typeof value !== "string" && !(value instanceof File)) {
-    //     value = value.toString();
-    //   }
-    //   formData.append(key, value);
-    // });
-
     formData.append("Title", newEvent.title);
     formData.append("StartTime", newEvent.startTime);
     formData.append("EndTime", newEvent.endTime);
@@ -69,7 +61,7 @@ const EditEvent = () => {
       if (response.status === 200) {
         setUpdateAllEvents((pre) => !pre);
         navigate("/events-posted");
-        toast.success("Event created successfully");
+        toast.success("Event updated successfully");
       }
     } catch (err) {
       console.log(err);
@@ -95,8 +87,9 @@ const EditEvent = () => {
       setNewEvent(updatedEvent);
       if (editEventForm.values.promoted && event.promoted === false) {
         setPromotePaymentDialogOpen(true);
+      } else {
+        handleUpdateEvent(updatedEvent);
       }
-      handleUpdateEvent(updatedEvent);
     },
   });
 
@@ -411,7 +404,7 @@ const EditEvent = () => {
                     <Checkbox
                       id="promoted"
                       name="promoted"
-                      disabled={editEventForm.values.promoted}
+                      disabled={event?.promoted}
                       checked={editEventForm.values.promoted}
                       onChange={editEventForm.handleChange}
                     />

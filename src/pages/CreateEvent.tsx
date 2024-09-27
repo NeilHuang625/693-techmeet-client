@@ -350,14 +350,14 @@ const CreateEvent = () => {
                     )}
                 </FormControl>
               </div>
-              <div className="flex items-baseline space-x-6">
+              <div className="flex items-baseline space-x-6 mt-2">
                 <InputLabel className="w-[108px]" htmlFor="description">
                   Description
                 </InputLabel>
                 <div className="flex flex-col w-3/4">
                   <ReactQuill
                     theme="snow"
-                    className="react-quill-form h-[1rem] "
+                    className=" h-20"
                     id="description"
                     value={createEventForm.values.description}
                     onChange={(value) => {
@@ -365,18 +365,19 @@ const CreateEvent = () => {
                       createEventForm.validateField("description");
                     }}
                   />
-                  {createEventForm.touched.description &&
-                  createEventForm.errors.description ? (
-                    <div className="text-red-500 text-sm">
-                      {createEventForm.errors.description}
-                    </div>
-                  ) : null}
+                  <div className="text-red-500 text-sm mt-12 ml-2">
+                    {createEventForm.touched.description &&
+                      createEventForm.errors.description && (
+                        <p>{createEventForm.errors.description}</p>
+                      )}
+                  </div>
                 </div>
               </div>
-              <div className="pl-32">
+              <div className=" pl-32 mt-2">
                 <FormControlLabel
                   control={
                     <Checkbox
+                      color="black"
                       id="promoted"
                       name="promoted"
                       checked={createEventForm.values.promoted}
@@ -398,8 +399,8 @@ const CreateEvent = () => {
                   }
                 />
               </div>
-              <div className="flex justify-end mt-3">
-                <Button variant="outlined" type="submit">
+              <div className="flex justify-center mt-10">
+                <Button color="error" variant="contained" type="submit">
                   Create
                 </Button>
               </div>
