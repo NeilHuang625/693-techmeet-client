@@ -11,11 +11,17 @@ import EventsAttending from "./pages/EventsAttending";
 import EventDetails from "./pages/EventDetails";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { getAllEvents, getUserEvents } from "./Utils/API";
+import {
+  getAllEvents,
+  getUserEvents,
+  basicURL,
+  getAllNotifications,
+} from "./Utils/API";
 import { createContext, useEffect, useState } from "react";
 import { useAuth } from "./Contexts/AuthProvider";
 import dayjs from "dayjs";
 import utc from "dayjs-plugin-utc";
+import * as signalR from "@microsoft/signalr";
 
 export interface AppEvent {
   id: number;
@@ -82,6 +88,7 @@ function App() {
   const [eventsCreated, setEventsCreated] = useState<AppEvent[]>([]);
   const [openLoginDialog, setOpenLoginDialog] = useState(false);
   const [updateAllEvents, setUpdateAllEvents] = useState(false);
+  const [notifications, setNotifications] = useState("");
 
   const { isAuthenticated, user, isLoading, jwt } = useAuth();
 
@@ -148,6 +155,35 @@ function App() {
       fetchUserEvents();
     }
   }, [allEvents, isLoading, isAuthenticated, jwt, user, updateAllEvents]);
+
+  // Get the notifications
+  useEffect(() => {
+    const fetchNotifications = async () => {
+      try {
+        const response = await getAllNotifications(jwt);
+        console.log(response.data);
+      } catch (err) {
+        console.log(err);
+      }
+    };
+    fetchNotifications();
+  }, []);
+
+  // SignalR
+  useEffect(() => {
+    const connection = new signalR.HubConnectionBuilder()
+      .withUrl(`${basicURL}/notificationHub`, {
+        accessTokenFactory: () => jwt || "",
+      })
+      .withAutomaticReconnect()
+      .build();
+
+    connection.on("ReceiveNotification", (notification) => {
+      console.log(notification);
+    });
+
+    connection.start().catch((err) => console.log(err));
+  }, []);
 
   const handleFilterClick = () => {
     const filteredEvents = allEvents.filter((event) => {

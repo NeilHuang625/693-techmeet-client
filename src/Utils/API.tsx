@@ -1,5 +1,5 @@
 import axios from "axios";
-const basicURL = "http://localhost:5269";
+export const basicURL = "http://localhost:5269";
 
 interface SignupUser {
   email: string;
@@ -159,6 +159,17 @@ export const deleteEvent = async (jwt: string, eventId: string) => {
 // Update Event
 export const updateEvent = async (jwt: string, eventId: any, event: any) => {
   const response = await axios.put(`${basicURL}/event/${eventId}`, event, {
+    headers: {
+      Authorization: `Bearer ${jwt}`,
+      "Cache-Control": "no-cache",
+    },
+  });
+  return response;
+};
+
+// Get All Notifications
+export const getAllNotifications = async (jwt: string) => {
+  const response = await axios.get(`${basicURL}/notifications`, {
     headers: {
       Authorization: `Bearer ${jwt}`,
       "Cache-Control": "no-cache",
