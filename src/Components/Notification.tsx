@@ -133,9 +133,10 @@ const Notification = () => {
                         <Typography
                           className="text-left pr-2 hover:text-green-500 overflow-hidden break-all"
                           component="button"
-                          onClick={() =>
-                            navigate(`/event-details/${n.eventId}`)
-                          }
+                          onClick={() => {
+                            navigate(`/event-details/${n.eventId}`);
+                            toggleDrawer();
+                          }}
                         >
                           {n.message}
                         </Typography>
