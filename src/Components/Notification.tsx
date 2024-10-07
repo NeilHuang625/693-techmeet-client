@@ -49,8 +49,8 @@ const Notification = () => {
         </Badge>
       </Button>
       <Drawer anchor="right" open={drawerOpen} onClose={toggleDrawer}>
-        <div className="w-80 m-8">
-          <Typography fontWeight="bold" fontSize="20px" mb="40px">
+        <div className="w-80 m-6">
+          <Typography fontWeight="bold" fontSize="20px" mb="30px">
             <NotificationsNoneIcon />
             Notifications
           </Typography>
@@ -80,7 +80,6 @@ const Notification = () => {
                         <div className="col-span-29">
                           <Typography
                             className="text-left hover:text-red-500"
-                            fontSize="14px"
                             component="button"
                             onClick={() => alert("hello")}
                           >
@@ -118,7 +117,7 @@ const Notification = () => {
                 Events Upcoming
               </Typography>
               {eventNotifications.map((n) => (
-                <div className="my-4 py-2 bg-slate-100 rounded">
+                <div className="my-4 py-1 bg-slate-100 rounded">
                   <div className="grid grid-cols-30">
                     <div className="flex">
                       <div className="col-span-1 mx-2">
@@ -130,20 +129,17 @@ const Notification = () => {
                           }}
                         />
                       </div>
-                      <div className="flex flex-col">
-                        <div className="col-span-29">
-                          <Typography
-                            className="text-left hover:text-green-500"
-                            fontSize="14px"
-                            component="button"
-                            onClick={() =>
-                              navigate(`/event-details/${n.eventId}`)
-                            }
-                          >
-                            {n.message}
-                          </Typography>
-                        </div>
-                        <div className="col-span-29 flex items-center justify-between ">
+                      <div className="col-span-29">
+                        <Typography
+                          className="text-left pr-2 hover:text-green-500 overflow-hidden break-all"
+                          component="button"
+                          onClick={() =>
+                            navigate(`/event-details/${n.eventId}`)
+                          }
+                        >
+                          {n.message}
+                        </Typography>
+                        <div className=" flex items-center justify-between">
                           <Typography fontSize="13px" color="grey">
                             {dayjs(n.createdAt).fromNow()}
                           </Typography>
