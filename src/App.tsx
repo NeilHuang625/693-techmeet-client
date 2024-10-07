@@ -40,6 +40,16 @@ export interface AppEvent {
   category: string;
 }
 
+interface Notification {
+  id: number;
+  message: string;
+  isRead: boolean;
+  userId: string;
+  eventId: number;
+  createdAt: string;
+  type: string;
+}
+
 export interface AppContextType {
   events: AppEvent[];
   setEvents: (events: AppEvent[]) => void;
@@ -65,6 +75,8 @@ export interface AppContextType {
   openLoginDialog: boolean;
   setOpenLoginDialog: (open: boolean) => void;
   setUpdateAllEvents: (update: boolean) => void;
+  notifications: Notification[];
+  setNotifications: (notifications: Notification[]) => void;
 }
 
 export const AppContext = createContext({} as AppContextType);
@@ -88,7 +100,7 @@ function App() {
   const [eventsCreated, setEventsCreated] = useState<AppEvent[]>([]);
   const [openLoginDialog, setOpenLoginDialog] = useState(false);
   const [updateAllEvents, setUpdateAllEvents] = useState(false);
-  const [notifications, setNotifications] = useState("");
+  const [notifications, setNotifications] = useState<Notification[]>([]);
 
   const { isAuthenticated, user, isLoading, jwt } = useAuth();
 
@@ -161,7 +173,15 @@ function App() {
     const fetchNotifications = async () => {
       try {
         const response = await getAllNotifications(jwt);
-        console.log(response.data);
+        console.log("utc", response.data);
+        const notificationsWithLocalTime = response.data.map(
+          (n: Notification) => ({
+            ...n,
+            createdAt: dayjs.utc(n.createdAt).local().format(),
+          })
+        );
+        console.log("local", notificationsWithLocalTime);
+        setNotifications(notificationsWithLocalTime);
       } catch (err) {
         console.log(err);
       }
@@ -179,10 +199,17 @@ function App() {
       .build();
 
     connection.on("ReceiveNotification", (notification) => {
-      console.log(notification);
+      setNotifications((preNotifications) => [
+        ...preNotifications,
+        notification,
+      ]);
     });
 
     connection.start().catch((err) => console.log(err));
+
+    return () => {
+      connection.stop().catch((err) => console.log(err));
+    };
   }, []);
 
   const handleFilterClick = () => {
@@ -240,6 +267,8 @@ function App() {
             openLoginDialog,
             setOpenLoginDialog,
             setUpdateAllEvents,
+            notifications,
+            setNotifications,
           }}
         >
           <Routes>

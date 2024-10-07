@@ -144,7 +144,6 @@ const NavBar = () => {
             {/* This is an empty Grid item to take up the remaining space */}
           </Grid>
         )}
-
         <Grid size={3}>
           <AccountMenu />
         </Grid>

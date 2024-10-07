@@ -1,6 +1,7 @@
 import React, { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
+import Notification from "./Notification";
 import Logout from "@mui/icons-material/Logout";
 import AddIcon from "@mui/icons-material/Add";
 import EditIcon from "@mui/icons-material/Edit";
@@ -149,6 +150,7 @@ const AccountMenu = () => {
           >
             Event
           </Button>
+          <Notification />
           <Tooltip title="Account">
             <IconButton
               onClick={handleClick}
