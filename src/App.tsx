@@ -187,7 +187,7 @@ function App() {
       }
     };
     fetchNotifications();
-  }, []);
+  }, [isAuthenticated]);
 
   // SignalR
   useEffect(() => {

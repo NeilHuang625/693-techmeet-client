@@ -1,6 +1,5 @@
 import axios from "axios";
 export const basicURL = "http://localhost:5269";
-
 interface SignupUser {
   email: string;
   password: string;
@@ -175,5 +174,20 @@ export const getAllNotifications = async (jwt: string) => {
       "Cache-Control": "no-cache",
     },
   });
+  return response;
+};
+
+// Mark Notification as Read
+export const markAsRead = async (jwt: string, id: number) => {
+  const response = await axios.put(
+    `${basicURL}/notifications/${id}`,
+    {},
+    {
+      headers: {
+        Authorization: `Bearer ${jwt}`,
+        "Cache-Control": "no-cache",
+      },
+    }
+  );
   return response;
 };

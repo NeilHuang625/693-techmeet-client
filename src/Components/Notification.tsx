@@ -6,6 +6,8 @@ import { useContext, useState } from "react";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import { useNavigate } from "react-router-dom";
+import { markAsRead } from "../Utils/API";
+import { useAuth } from "../Contexts/AuthProvider";
 
 dayjs.extend(relativeTime);
 
@@ -13,6 +15,7 @@ const Notification = () => {
   const { notifications, setNotifications } = useContext(AppContext);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const navigate = useNavigate();
+  const { jwt } = useAuth();
 
   const toggleDrawer = () => {
     setDrawerOpen(!drawerOpen);
@@ -24,6 +27,19 @@ const Notification = () => {
   const eventNotifications = notifications.filter(
     (n) => n.type === "event_upcoming"
   );
+
+  const handleButtonClick = async (jwt: string, id: number) => {
+    try {
+      const response = await markAsRead(jwt, id);
+
+      if (response.status === 204) {
+        const updatedNotifications = notifications.filter((n) => n.id !== id);
+        setNotifications(updatedNotifications);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   return (
     <div>
@@ -76,6 +92,7 @@ const Notification = () => {
                             {dayjs(n.createdAt).fromNow()}
                           </Typography>
                           <Button
+                            onClick={() => handleButtonClick(jwt, n.id)}
                             variant="text"
                             size="small"
                             style={{
@@ -131,6 +148,7 @@ const Notification = () => {
                             {dayjs(n.createdAt).fromNow()}
                           </Typography>
                           <Button
+                            onClick={() => handleButtonClick(jwt, n.id)}
                             variant="text"
                             size="small"
                             style={{
