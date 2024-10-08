@@ -21,9 +21,11 @@ import {
 } from "../Utils/API";
 import { toast } from "react-toastify";
 import ConfirmDialog from "../Components/Dialogs/ConfirmDialog";
+import { useNavigate } from "react-router-dom";
 
 const EventDetails = () => {
   const { eventId } = useParams();
+  const navigate = useNavigate();
   const {
     allEvents,
     eventsAttending,
@@ -157,7 +159,12 @@ const EventDetails = () => {
                 </Avatar>
                 <div className="ml-6">
                   <Typography variant="body2">Hosted By</Typography>
-                  <Typography variant="body2" style={{ fontWeight: "bold" }}>
+                  <Typography
+                    variant="body2"
+                    component="button"
+                    onClick={() => navigate(`/chat/${event.userId}`)}
+                    style={{ fontWeight: "bold" }}
+                  >
                     {event.user}
                   </Typography>
                 </div>

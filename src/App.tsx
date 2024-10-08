@@ -9,6 +9,7 @@ import EditEvent from "./pages/EditEvent";
 import EventsPosted from "./pages/EventsPosted";
 import EventsAttending from "./pages/EventsAttending";
 import EventDetails from "./pages/EventDetails";
+import Chat from "./pages/Chat";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import {
@@ -77,6 +78,11 @@ export interface AppContextType {
   setUpdateAllEvents: (update: boolean) => void;
   notifications: Notification[];
   setNotifications: (notifications: Notification[]) => void;
+  message: string;
+  setMessage: (message: string) => void;
+  messages: string[];
+  setMessages: (messages: string[]) => void;
+  hubConnection: any;
 }
 
 export const AppContext = createContext({} as AppContextType);
@@ -101,6 +107,9 @@ function App() {
   const [openLoginDialog, setOpenLoginDialog] = useState(false);
   const [updateAllEvents, setUpdateAllEvents] = useState(false);
   const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [message, setMessage] = useState("");
+  const [messages, setMessages] = useState<string[]>([]);
+  const [hubConnection, setHubConnection] = useState<any>(null);
 
   const { isAuthenticated, user, isLoading, jwt } = useAuth();
 
@@ -170,6 +179,7 @@ function App() {
 
   // Get the notifications
   useEffect(() => {
+    if (!isAuthenticated) return;
     const fetchNotifications = async () => {
       try {
         const response = await getAllNotifications(jwt);
@@ -189,8 +199,9 @@ function App() {
     fetchNotifications();
   }, [isAuthenticated, allEvents]);
 
-  // SignalR
+  // SignalR for notifications
   useEffect(() => {
+    if (!isAuthenticated) return;
     const connection = new signalR.HubConnectionBuilder()
       .withUrl(`${basicURL}/notificationHub`, {
         accessTokenFactory: () => jwt || "",
@@ -210,7 +221,42 @@ function App() {
     return () => {
       connection.stop().catch((err) => console.log(err));
     };
-  }, []);
+  }, [isAuthenticated, jwt]);
+
+  // SignalR for chat
+  useEffect(() => {
+    if (!isAuthenticated) return;
+    const createConnection = async () => {
+      const hubConnect = new signalR.HubConnectionBuilder()
+        .withUrl(`${basicURL}/chatHub`, {
+          accessTokenFactory: () => jwt || "",
+        })
+        .withAutomaticReconnect()
+        .build();
+
+      try {
+        await hubConnect.start();
+        console.log("Connection started");
+      } catch (err) {
+        alert("Error while establishing connection");
+      }
+
+      hubConnect.on("ReceiveMessage", (receivedMessage) => {
+        console.log(receivedMessage);
+        setMessages((pre) => [...pre, receivedMessage]);
+      });
+
+      setHubConnection(hubConnect);
+    };
+
+    createConnection();
+  }, [isAuthenticated, jwt]);
+
+  useEffect(() => {
+    return () => {
+      hubConnection?.stop();
+    };
+  }, [hubConnection]);
 
   const handleFilterClick = () => {
     const filteredEvents = allEvents.filter((event) => {
@@ -269,6 +315,11 @@ function App() {
             setUpdateAllEvents,
             notifications,
             setNotifications,
+            message,
+            setMessage,
+            messages,
+            setMessages,
+            hubConnection,
           }}
         >
           <Routes>
@@ -306,6 +357,14 @@ function App() {
               element={
                 <ProtectedRoute>
                   <EventsAttending />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/chat/:userId"
+              element={
+                <ProtectedRoute>
+                  <Chat />
                 </ProtectedRoute>
               }
             />
