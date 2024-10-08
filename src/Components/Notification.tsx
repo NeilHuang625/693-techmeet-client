@@ -1,6 +1,13 @@
 import NotificationsNoneIcon from "@mui/icons-material/NotificationsNone";
 import FiberManualRecordIcon from "@mui/icons-material/FiberManualRecord";
-import { Badge, Button, Divider, Drawer, Typography } from "@mui/material";
+import {
+  Badge,
+  Button,
+  Divider,
+  Drawer,
+  IconButton,
+  Typography,
+} from "@mui/material";
 import { AppContext } from "../App";
 import { useContext, useState } from "react";
 import dayjs from "dayjs";
@@ -43,11 +50,11 @@ const Notification = () => {
 
   return (
     <div>
-      <Button color="inherit" onClick={toggleDrawer}>
+      <IconButton color="inherit" onClick={toggleDrawer}>
         <Badge badgeContent={notifications.length} color="error">
           <NotificationsNoneIcon />
         </Badge>
-      </Button>
+      </IconButton>
       <Drawer anchor="right" open={drawerOpen} onClose={toggleDrawer}>
         <div className="w-80 m-6">
           <Typography fontWeight="bold" fontSize="20px" mb="30px">

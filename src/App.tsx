@@ -82,7 +82,7 @@ export interface AppContextType {
   setMessage: (message: string) => void;
   messages: string[];
   setMessages: (messages: string[]) => void;
-  hubConnection: any;
+  hubConnection: signalR.HubConnection | undefined;
 }
 
 export const AppContext = createContext({} as AppContextType);
@@ -109,7 +109,7 @@ function App() {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState<string[]>([]);
-  const [hubConnection, setHubConnection] = useState<any>(null);
+  const [hubConnection, setHubConnection] = useState<signalR.HubConnection>();
 
   const { isAuthenticated, user, isLoading, jwt } = useAuth();
 
@@ -226,36 +226,25 @@ function App() {
   // SignalR for chat
   useEffect(() => {
     if (!isAuthenticated) return;
-    const createConnection = async () => {
-      const hubConnect = new signalR.HubConnectionBuilder()
-        .withUrl(`${basicURL}/chatHub`, {
-          accessTokenFactory: () => jwt || "",
-        })
-        .withAutomaticReconnect()
-        .build();
 
-      try {
-        await hubConnect.start();
-        console.log("Connection started");
-      } catch (err) {
-        alert("Error while establishing connection");
-      }
+    const hubConnect = new signalR.HubConnectionBuilder()
+      .withUrl(`${basicURL}/chatHub`, {
+        accessTokenFactory: () => jwt || "",
+      })
+      .withAutomaticReconnect()
+      .build();
 
-      hubConnect.on("ReceiveMessage", (receivedMessage) => {
-        console.log(receivedMessage);
-        setMessages((pre) => [...pre, receivedMessage]);
-      });
+    hubConnect.start().catch((err) => console.log(err));
 
-      setHubConnection(hubConnect);
-    };
-    createConnection();
-  }, [isAuthenticated, jwt]);
-
-  useEffect(() => {
+    hubConnect.on("ReceiveMessage", (receivedMessage) => {
+      console.log(receivedMessage);
+      setMessages((pre) => [...pre, receivedMessage]);
+    });
+    setHubConnection(hubConnect);
     return () => {
-      hubConnection?.stop();
+      hubConnect.stop().catch((err) => console.log(err));
     };
-  }, [hubConnection]);
+  }, [isAuthenticated, jwt]);
 
   const handleFilterClick = () => {
     const filteredEvents = allEvents.filter((event) => {
