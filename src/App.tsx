@@ -248,7 +248,6 @@ function App() {
 
       setHubConnection(hubConnect);
     };
-
     createConnection();
   }, [isAuthenticated, jwt]);
 
