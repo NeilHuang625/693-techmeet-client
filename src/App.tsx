@@ -23,6 +23,7 @@ import { useAuth } from "./Contexts/AuthProvider";
 import dayjs from "dayjs";
 import utc from "dayjs-plugin-utc";
 import * as signalR from "@microsoft/signalr";
+import { MessageProps } from "./pages/Chat";
 
 export interface AppEvent {
   id: number;
@@ -80,8 +81,8 @@ export interface AppContextType {
   setNotifications: (notifications: Notification[]) => void;
   message: string;
   setMessage: (message: string) => void;
-  messages: string[];
-  setMessages: (messages: string[]) => void;
+  messages: MessageProps[];
+  setMessages: (messages: MessageProps[]) => void;
   hubConnection: signalR.HubConnection | undefined;
 }
 
@@ -108,8 +109,8 @@ function App() {
   const [updateAllEvents, setUpdateAllEvents] = useState(false);
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [message, setMessage] = useState("");
-  const [messages, setMessages] = useState<string[]>([]);
-  const [hubConnection, setHubConnection] = useState<signalR.HubConnection>();
+  const [messages, setMessages] = useState<MessageProps[]>([]);
+  const [hubConnection, setHubConnection] = useState<signalR.HubConnection>(); // SignalR connection for sending messages
 
   const { isAuthenticated, user, isLoading, jwt } = useAuth();
 
@@ -349,7 +350,7 @@ function App() {
               }
             />
             <Route
-              path="/chat/:userId"
+              path="/chat/:receiverId"
               element={
                 <ProtectedRoute>
                   <Chat />

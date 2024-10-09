@@ -191,3 +191,13 @@ export const markAsRead = async (jwt: string, id: number) => {
   );
   return response;
 };
+
+// Get Chat Messages
+export const GetChatMessages = async (jwt: string) => {
+  const response = await axios.get(`${basicURL}/message`, {
+    headers: {
+      Authorization: `Bearer ${jwt}`,
+    },
+  });
+  return response;
+};
