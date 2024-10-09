@@ -20,11 +20,11 @@ const Chat = () => {
   const { jwt } = useAuth();
   const { hubConnection, message, setMessage, messages, setMessages } =
     useContext(AppContext);
-
   useEffect(() => {
     const fetchChatMessages = async () => {
       try {
-        const response = await GetChatMessages(jwt || "");
+        const response = await GetChatMessages(jwt || "", receiverId || "");
+        console.log(response);
         setMessages(response.data);
       } catch (err) {
         console.error(err);
