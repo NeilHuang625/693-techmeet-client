@@ -6,7 +6,9 @@ import { useContext } from "react";
 
 const EventsAttending = () => {
   const { eventsAttending, eventsWaiting } = useContext(AppContext);
-  const allEvents = [...eventsAttending, ...eventsWaiting];
+  const allEvents = [...eventsAttending, ...eventsWaiting].sort(
+    (a, b) => new Date(a.startTime) - new Date(b.startTime)
+  );
   return (
     <div className="flex flex-col min-h-screen">
       <NavBar />

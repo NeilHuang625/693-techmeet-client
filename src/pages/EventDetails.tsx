@@ -32,6 +32,7 @@ const EventDetails = () => {
     eventsWaiting,
     setEventsWaiting,
     setAllEvents,
+    setUpdateAllEvents,
     setOpenLoginDialog,
   } = useContext(AppContext);
   const { jwt, isAuthenticated } = useAuth();
@@ -73,6 +74,7 @@ const EventDetails = () => {
       const response = await attendEvent(jwt, eventId);
       if (response.status === 200) {
         toast.success("Event attended successfully");
+        setUpdateAllEvents((pre) => !pre);
         setAllEvents((pre) =>
           pre.map((event) =>
             event.id === Number(eventId)
@@ -80,6 +82,7 @@ const EventDetails = () => {
               : event
           )
         );
+        setIsLoading(true);
       }
     } catch (error) {
       console.error(error);
@@ -91,6 +94,7 @@ const EventDetails = () => {
       const response = await withdrawEvent(jwt, eventId);
       if (response.status === 200) {
         toast.success("Event withdrawn successfully");
+        setUpdateAllEvents((pre) => !pre);
         setAllEvents((pre) =>
           pre.map((event) =>
             event.id === Number(eventId)
@@ -98,6 +102,7 @@ const EventDetails = () => {
               : event
           )
         );
+        setIsLoading(true);
       }
     } catch (error) {
       console.error(error);
