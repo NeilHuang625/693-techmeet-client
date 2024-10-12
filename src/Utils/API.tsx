@@ -192,12 +192,26 @@ export const markAsRead = async (jwt: string, id: number) => {
   return response;
 };
 
-// Get Chat Messages
+// Get Chat Messages. For now receiverId is not be used
 export const GetChatMessages = async (jwt: string, receiverId: string) => {
   const response = await axios.get(`${basicURL}/message/${receiverId}`, {
     headers: {
       Authorization: `Bearer ${jwt}`,
     },
   });
+  return response;
+};
+
+// Mark Chat Messages as Read
+export const markMessagesAsRead = async (jwt: string, receiverId: string) => {
+  const response = await axios.put(
+    `${basicURL}/message/${receiverId}`,
+    {},
+    {
+      headers: {
+        Authorization: `Bearer ${jwt}`,
+      },
+    }
+  );
   return response;
 };

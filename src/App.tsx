@@ -84,6 +84,8 @@ export interface AppContextType {
   messages: MessageProps[];
   setMessages: (messages: MessageProps[]) => void;
   hubConnection: signalR.HubConnection | undefined;
+  messagesGroupByReceiver: any[];
+  setMessagesGroupByReceiver: (messages: any[]) => void;
 }
 
 export const AppContext = createContext({} as AppContextType);
@@ -111,6 +113,9 @@ function App() {
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState<MessageProps[]>([]);
   const [hubConnection, setHubConnection] = useState<signalR.HubConnection>(); // SignalR connection for sending messages
+  const [messagesGroupByReceiver, setMessagesGroupByReceiver] = useState<any[]>(
+    []
+  ); // Group messages by receiver after fetching
 
   const { isAuthenticated, user, isLoading, jwt } = useAuth();
 
@@ -309,6 +314,8 @@ function App() {
             messages,
             setMessages,
             hubConnection,
+            messagesGroupByReceiver,
+            setMessagesGroupByReceiver,
           }}
         >
           <Routes>
