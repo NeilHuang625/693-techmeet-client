@@ -5,6 +5,7 @@ import { AppContext } from "../App";
 import { useContext, useEffect, useState } from "react";
 import { GetChatMessages, markMessagesAsRead } from "../Utils/API";
 import checkUnreadMessage from "../Utils/checkUnreadMessage";
+import groupMessagesByReceiver from "../Utils/groupMessagesByReceiver";
 import { useAuth } from "../Contexts/AuthProvider";
 import dayjs from "dayjs";
 import utc from "dayjs-plugin-utc";
@@ -86,61 +87,15 @@ const Chat = () => {
     fetchChatMessages();
   }, [receiverId]);
 
-  const groupMessagesByReceiver = (messages: MessageProps[]) => {
-    return messages.reduce(
-      (
-        acc: {
-          [key: string]: { messages: MessageProps[]; unreadCount: number };
-        },
-        message: MessageProps
-      ) => {
-        let otherUserId = null;
-        if (message.receiverId === userId) {
-          otherUserId = message.senderId;
-        } else if (message.senderId === userId) {
-          otherUserId = message.receiverId;
-        }
-
-        if (otherUserId) {
-          if (!acc[otherUserId]) {
-            acc[otherUserId] = { messages: [], unreadCount: 0 };
-          }
-          acc[otherUserId].messages.push(message);
-
-          // If the message is unread, and the receiver is the current user, and currently not chatting with this sender, increment the unread count.
-          if (
-            !message.isRead &&
-            message.receiverId === userId &&
-            message.senderId !== receiverId
-          ) {
-            acc[otherUserId].unreadCount += 1;
-          } else if (
-            !message.isRead &&
-            message.receiverId === userId &&
-            message.senderId === receiverId
-          ) {
-            setMessages((preMessages) =>
-              preMessages.map((m) =>
-                m.id === message.id ? { ...m, isRead: true } : m
-              )
-            );
-            try {
-              markMessagesAsRead(jwt || "", receiverId || "");
-            } catch (err) {
-              console.error(err);
-            }
-          }
-        }
-
-        return acc;
-      },
-      {}
-    );
-  };
-
   useEffect(() => {
     if (messages) {
-      const groupedMessages = groupMessagesByReceiver(messages);
+      const groupedMessages = groupMessagesByReceiver(
+        receiverId || "",
+        userId || "",
+        jwt || "",
+        messages,
+        setMessages
+      );
       setMessagesAfterGroup(groupedMessages);
     }
   }, [messages]);
