@@ -124,7 +124,11 @@ const Chat = () => {
                 m.id === message.id ? { ...m, isRead: true } : m
               )
             );
-            handleMarkMessagesAsRead(receiverId);
+            try {
+              markMessagesAsRead(jwt || "", receiverId || "");
+            } catch (err) {
+              console.error(err);
+            }
           }
         }
 
