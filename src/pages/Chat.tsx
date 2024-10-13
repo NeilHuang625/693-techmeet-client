@@ -68,45 +68,16 @@ const Chat = () => {
   const { receiverId } = useParams();
   const { jwt, user } = useAuth();
   const userId = user?.id;
-  const {
-    hubConnection,
-    message,
-    setMessage,
-    messages,
-    setMessages,
-    messagesGroupByReceiver,
-    setMessagesGroupByReceiver,
-  } = useContext(AppContext);
+  const { hubConnection, message, setMessage, messages, setMessages } =
+    useContext(AppContext);
 
   const [value, setValue] = useState(0);
+  const [messagesAfterGroup, setMessagesAfterGroup] = useState({});
 
   useEffect(() => {
-    console.log("receiverId", receiverId);
     const fetchChatMessages = async () => {
       try {
         const response = await GetChatMessages(jwt || "", receiverId || "");
-        const groupMessagesByReceiver = response.data.reduce(
-          (acc: { [key: string]: MessageProps[] }, message: MessageProps) => {
-            let otherUserId = null;
-            if (message.receiverId === userId) {
-              otherUserId = message.senderId;
-            } else if (message.senderId === userId) {
-              otherUserId = message.receiverId;
-            }
-
-            if (otherUserId) {
-              if (!acc[otherUserId]) {
-                acc[otherUserId] = [];
-              }
-              acc[otherUserId].push(message);
-            }
-
-            return acc;
-          },
-          {}
-        );
-        console.log("messages after group", groupMessagesByReceiver);
-        setMessagesGroupByReceiver(groupMessagesByReceiver);
         setMessages(response.data);
       } catch (err) {
         console.error(err);
@@ -114,6 +85,61 @@ const Chat = () => {
     };
     fetchChatMessages();
   }, [receiverId]);
+
+  const groupMessagesByReceiver = (messages: MessageProps[]) => {
+    return messages.reduce(
+      (
+        acc: {
+          [key: string]: { messages: MessageProps[]; unreadCount: number };
+        },
+        message: MessageProps
+      ) => {
+        let otherUserId = null;
+        if (message.receiverId === userId) {
+          otherUserId = message.senderId;
+        } else if (message.senderId === userId) {
+          otherUserId = message.receiverId;
+        }
+
+        if (otherUserId) {
+          if (!acc[otherUserId]) {
+            acc[otherUserId] = { messages: [], unreadCount: 0 };
+          }
+          acc[otherUserId].messages.push(message);
+
+          // If the message is unread, and the receiver is the current user, and currently not chatting with this sender, increment the unread count.
+          if (
+            !message.isRead &&
+            message.receiverId === userId &&
+            message.senderId !== receiverId
+          ) {
+            acc[otherUserId].unreadCount += 1;
+          } else if (
+            !message.isRead &&
+            message.receiverId === userId &&
+            message.senderId === receiverId
+          ) {
+            setMessages((preMessages) =>
+              preMessages.map((m) =>
+                m.id === message.id ? { ...m, isRead: true } : m
+              )
+            );
+            handleMarkMessagesAsRead(receiverId);
+          }
+        }
+
+        return acc;
+      },
+      {}
+    );
+  };
+
+  useEffect(() => {
+    if (messages) {
+      const groupedMessages = groupMessagesByReceiver(messages);
+      setMessagesAfterGroup(groupedMessages);
+    }
+  }, [messages]);
 
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
@@ -178,8 +204,8 @@ const Chat = () => {
             aria-label="Vertical tabs example"
             sx={{ borderRight: 1, borderColor: "divider" }}
           >
-            {Object.entries(messagesGroupByReceiver).map(
-              ([receiversId, messages], index) => (
+            {Object.entries(messagesAfterGroup).map(
+              ([receiversId, { messages, unreadCount }], index) => (
                 <Tab
                   onClick={() => {
                     navigate(`/chat/${receiversId}`);
@@ -190,19 +216,19 @@ const Chat = () => {
                       }
                     }
                   }}
-                  label={
+                  label={`${
                     messages[0].senderId === userId
                       ? messages[0].receiverNickname
                       : messages[0].senderNickname
-                  }
+                  } (${unreadCount})`}
                   {...a11yProps(index)}
                   key={`tab-${receiverId}-${index}`}
                 />
               )
             )}
           </Tabs>
-          {Object.entries(messagesGroupByReceiver).map(
-            ([receiverId, messages], index) => (
+          {Object.entries(messagesAfterGroup).map(
+            ([receiverId, { messages, unreadCount }], index) => (
               <TabPanel
                 value={value}
                 index={index}
@@ -210,9 +236,8 @@ const Chat = () => {
                 style={{ overflowY: "scroll" }}
               >
                 {messages.map((message: MessageProps) => (
-                  <div key={message.id} className="flex flex-col">
+                  <div key={message.id} className="flex flex-col my-4">
                     <div className="flex justify-between">
-                      <div>{message.receiverNickname}</div>
                       <div>
                         {dayjs(
                           dayjs.utc(message.createdAt).local().format()
@@ -220,6 +245,7 @@ const Chat = () => {
                       </div>
                     </div>
                     <div>{message.content}</div>
+                    <div>sent from:{message.senderNickname}</div>
                   </div>
                 ))}
               </TabPanel>
