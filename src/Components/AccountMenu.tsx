@@ -139,6 +139,7 @@ const AccountMenu = () => {
             alignItems: "center",
             justifyContent: "flex-end",
             textAlign: "center",
+            gap: "8px",
           }}
         >
           <Button

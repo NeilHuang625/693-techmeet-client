@@ -91,6 +91,8 @@ export interface AppContextType {
   setMessagesAfterGroup: (messages: {
     [key: string]: { messages: MessageProps[]; unreadCount: number };
   }) => void;
+  totalUnreadCount: number;
+  setTotalUnreadCount: (count: number) => void;
 }
 
 export const AppContext = createContext({} as AppContextType);
@@ -119,6 +121,7 @@ function App() {
   const [messages, setMessages] = useState<MessageProps[]>([]);
   const [hubConnection, setHubConnection] = useState<signalR.HubConnection>(); // SignalR connection for sending messages
   const [messagesAfterGroup, setMessagesAfterGroup] = useState({});
+  const [totalUnreadCount, setTotalUnreadCount] = useState(0);
 
   const { isAuthenticated, user, isLoading, jwt } = useAuth();
 
@@ -268,6 +271,42 @@ function App() {
     fetchAllMessages();
   }, []);
 
+  // Group messages by receiver
+  useEffect(() => {
+    const messagesAfterGroup = messages.reduce(
+      (
+        acc: {
+          [key: string]: { messages: MessageProps[]; unreadCount: number };
+        },
+        message: MessageProps
+      ) => {
+        let otherUserId = null;
+        if (message.receiverId === user?.id) {
+          otherUserId = message.senderId;
+        } else if (message.senderId === user?.id) {
+          otherUserId = message.receiverId;
+        }
+        if (otherUserId) {
+          if (!acc[otherUserId]) {
+            acc[otherUserId] = { messages: [], unreadCount: 0 };
+          }
+          acc[otherUserId].messages.push(message);
+          if (!message.isRead && message.receiverId === user?.id) {
+            acc[otherUserId].unreadCount += 1;
+          }
+        }
+        return acc;
+      },
+      {}
+    );
+    const totalUnreadCount = Object.values(messagesAfterGroup).reduce(
+      (acc, { unreadCount }) => acc + unreadCount,
+      0
+    );
+    setTotalUnreadCount(totalUnreadCount);
+    setMessagesAfterGroup(messagesAfterGroup);
+  }, [messages]);
+
   const handleFilterClick = () => {
     const filteredEvents = allEvents.filter((event) => {
       const cityMatch = selectedCity
@@ -332,6 +371,8 @@ function App() {
             hubConnection,
             messagesAfterGroup,
             setMessagesAfterGroup,
+            totalUnreadCount,
+            setTotalUnreadCount,
           }}
         >
           <Routes>
