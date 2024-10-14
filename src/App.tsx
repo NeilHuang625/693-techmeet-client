@@ -17,6 +17,7 @@ import {
   getUserEvents,
   basicURL,
   getAllNotifications,
+  getAllMessages,
 } from "./Utils/API";
 import { createContext, useEffect, useState } from "react";
 import { useAuth } from "./Contexts/AuthProvider";
@@ -84,6 +85,12 @@ export interface AppContextType {
   messages: MessageProps[];
   setMessages: (messages: MessageProps[]) => void;
   hubConnection: signalR.HubConnection | undefined;
+  messagesAfterGroup: {
+    [key: string]: { messages: MessageProps[]; unreadCount: number };
+  };
+  setMessagesAfterGroup: (messages: {
+    [key: string]: { messages: MessageProps[]; unreadCount: number };
+  }) => void;
 }
 
 export const AppContext = createContext({} as AppContextType);
@@ -111,6 +118,7 @@ function App() {
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState<MessageProps[]>([]);
   const [hubConnection, setHubConnection] = useState<signalR.HubConnection>(); // SignalR connection for sending messages
+  const [messagesAfterGroup, setMessagesAfterGroup] = useState({});
 
   const { isAuthenticated, user, isLoading, jwt } = useAuth();
 
@@ -247,6 +255,19 @@ function App() {
     };
   }, [isAuthenticated, jwt]);
 
+  // Fetch all messages
+  useEffect(() => {
+    const fetchAllMessages = async () => {
+      try {
+        const response = await getAllMessages(jwt || "");
+        setMessages(response.data);
+      } catch (err) {
+        console.log(err);
+      }
+    };
+    fetchAllMessages();
+  }, []);
+
   const handleFilterClick = () => {
     const filteredEvents = allEvents.filter((event) => {
       const cityMatch = selectedCity
@@ -309,6 +330,8 @@ function App() {
             messages,
             setMessages,
             hubConnection,
+            messagesAfterGroup,
+            setMessagesAfterGroup,
           }}
         >
           <Routes>

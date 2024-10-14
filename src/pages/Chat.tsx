@@ -69,11 +69,17 @@ const Chat = () => {
   const { receiverId } = useParams();
   const { jwt, user } = useAuth();
   const userId = user?.id;
-  const { hubConnection, message, setMessage, messages, setMessages } =
-    useContext(AppContext);
+  const {
+    hubConnection,
+    message,
+    setMessage,
+    messages,
+    setMessages,
+    messagesAfterGroup,
+    setMessagesAfterGroup,
+  } = useContext(AppContext);
 
   const [value, setValue] = useState(0);
-  const [messagesAfterGroup, setMessagesAfterGroup] = useState({});
 
   useEffect(() => {
     const fetchChatMessages = async () => {

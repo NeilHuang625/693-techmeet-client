@@ -215,3 +215,13 @@ export const markMessagesAsRead = async (jwt: string, receiverId: string) => {
   );
   return response;
 };
+
+// Get all messages
+export const getAllMessages = async (jwt: string) => {
+  const response = await axios.get(`${basicURL}/message`, {
+    headers: {
+      Authorization: `Bearer ${jwt}`,
+    },
+  });
+  return response;
+};
