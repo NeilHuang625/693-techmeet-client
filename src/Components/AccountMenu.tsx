@@ -11,6 +11,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import LoginIcon from "@mui/icons-material/Login";
 import AppRegistrationIcon from "@mui/icons-material/AppRegistration";
 import PersonOutlineIcon from "@mui/icons-material/PersonOutline";
+import MailOutlineIcon from "@mui/icons-material/MailOutline";
 import { toast } from "react-toastify";
 import {
   Avatar,
@@ -26,6 +27,7 @@ import {
   ListItemIcon,
   Menu,
   MenuItem,
+  Divider,
 } from "@mui/material";
 import { useFormik } from "formik";
 import { signup, logout, login } from "../Utils/API";
@@ -403,10 +405,17 @@ const AccountMenu = () => {
       >
         <MenuItem>
           <ListItemIcon>
-            <PersonOutlineIcon fontSize="small" />
+            <MailOutlineIcon fontSize="small" />
           </ListItemIcon>
           {user?.email}
         </MenuItem>
+        <MenuItem>
+          <ListItemIcon>
+            <PersonOutlineIcon fontSize="small" />
+          </ListItemIcon>
+          View profile
+        </MenuItem>
+        <Divider />
         <MenuItem onClick={handleLogout}>
           <ListItemIcon>
             <Logout fontSize="small" />
