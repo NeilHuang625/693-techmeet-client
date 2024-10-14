@@ -1,5 +1,5 @@
 import ChatBubbleOutlineIcon from "@mui/icons-material/ChatBubbleOutline";
-import { Badge, IconButton } from "@mui/material";
+import { Badge, Button, IconButton } from "@mui/material";
 import { useState } from "react";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
@@ -9,8 +9,10 @@ import { AppContext } from "../App";
 import { useContext } from "react";
 import { useAuth } from "../Contexts/AuthProvider";
 import dayjs from "dayjs";
+import { useNavigate } from "react-router-dom";
 
 const Message = () => {
+  const navigate = useNavigate();
   const { user } = useAuth();
   const userId = user?.id;
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -84,7 +86,13 @@ const Message = () => {
         {totalUnreadCount > 0 ? (
           Object.entries(messagesAfterGroup).map(
             ([receiverId, { messages, unreadCount }]) => (
-              <MenuItem key={receiverId} onClick={handleClose}>
+              <MenuItem
+                key={receiverId}
+                onClick={() => {
+                  handleClose;
+                  navigate(`/chat/${receiverId}`);
+                }}
+              >
                 <div className="grid grid-cols-11 w-full items-center">
                   <div className="col-span-2 left">
                     <Avatar />
@@ -117,7 +125,12 @@ const Message = () => {
             )
           )
         ) : (
-          <MenuItem>No unread messages</MenuItem>
+          <MenuItem>
+            <div className="flex items-center justify-between w-full">
+              <p>No unread messages</p>
+              <Button onClick={() => navigate("/chat")}>start chat</Button>
+            </div>
+          </MenuItem>
         )}
       </Menu>
     </>
