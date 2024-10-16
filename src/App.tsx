@@ -10,6 +10,7 @@ import EventsPosted from "./pages/EventsPosted";
 import EventsAttending from "./pages/EventsAttending";
 import EventDetails from "./pages/EventDetails";
 import Chat from "./pages/Chat";
+import Profile from "./pages/Profile";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import {
@@ -41,6 +42,7 @@ export interface AppEvent {
   promoted: boolean;
   categoryId: number;
   category: string;
+  profileImageUrl: string;
 }
 
 interface Notification {
@@ -93,6 +95,8 @@ export interface AppContextType {
   }) => void;
   totalUnreadCount: number;
   setTotalUnreadCount: (count: number) => void;
+  event: AppEvent | undefined;
+  setEvent: (event: AppEvent | undefined) => void;
 }
 
 export const AppContext = createContext({} as AppContextType);
@@ -122,6 +126,7 @@ function App() {
   const [hubConnection, setHubConnection] = useState<signalR.HubConnection>(); // SignalR connection for sending messages
   const [messagesAfterGroup, setMessagesAfterGroup] = useState({});
   const [totalUnreadCount, setTotalUnreadCount] = useState(0);
+  const [event, setEvent] = useState<AppEvent>();
 
   const { isAuthenticated, user, isLoading, jwt } = useAuth();
 
@@ -269,7 +274,7 @@ function App() {
       }
     };
     fetchAllMessages();
-  }, []);
+  }, [jwt]);
 
   // Group messages by receiver
   useEffect(() => {
@@ -373,6 +378,8 @@ function App() {
             setMessagesAfterGroup,
             totalUnreadCount,
             setTotalUnreadCount,
+            event,
+            setEvent,
           }}
         >
           <Routes>
@@ -386,6 +393,14 @@ function App() {
               element={
                 <ProtectedRoute>
                   <CreateEvent />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/profile"
+              element={
+                <ProtectedRoute>
+                  <Profile />
                 </ProtectedRoute>
               }
             />

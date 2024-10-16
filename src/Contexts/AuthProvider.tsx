@@ -9,11 +9,12 @@ import {
   SetStateAction,
 } from "react";
 
-interface User {
+export interface User {
   id: string;
   email: string;
   nickname: string;
   roles: string;
+  profileImageUrl: string;
 }
 interface AuthContextType {
   isAuthenticated: boolean;
@@ -99,6 +100,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
             decodedJwt[
               "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname"
             ],
+          profileImageUrl: decodedJwt["ProfilePhotoUrl"],
         };
         setUser(userData);
         setIsLoading(false);

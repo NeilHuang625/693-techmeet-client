@@ -2,6 +2,19 @@ import * as yup from "yup";
 
 // Signup form validation
 const signupValidationSchema = yup.object({
+  nickname: yup
+    .string()
+    .min(3, "Name should be more than 2 characters")
+    .max(20, "Name can not be longer than 20 characters")
+    .required("Nickname is required"),
+  imageFile: yup
+    .mixed()
+    .test(
+      "fileSize",
+      "File size is larger than 2MB",
+      (value) => value && (value as File).size <= 2 * 1024 * 1024
+    )
+    .required("Image is required"),
   email: yup
     .string()
     .email("Enter a valid email")

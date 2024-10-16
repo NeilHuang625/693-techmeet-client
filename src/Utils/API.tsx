@@ -6,8 +6,12 @@ interface SignupUser {
   nickname?: string;
 }
 
-export const signup = async (user: SignupUser) => {
-  const response = await axios.post(`${basicURL}/account/register`, user);
+export const signup = async (formData: FormData) => {
+  // Print formData for debugging
+  for (let pair of formData.entries()) {
+    console.log(pair[0] + ", " + pair[1]);
+  }
+  const response = await axios.post(`${basicURL}/account/register`, formData);
   return response;
 };
 
@@ -41,6 +45,15 @@ export const refreshToken = async (jwt: string) => {
       },
     }
   );
+  return response;
+};
+
+export const getReceiverInfo = async (jwt: string, receiverId: string) => {
+  const response = await axios.get(`${basicURL}/account/${receiverId}`, {
+    headers: {
+      Authorization: `Bearer ${jwt}`,
+    },
+  });
   return response;
 };
 

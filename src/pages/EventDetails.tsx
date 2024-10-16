@@ -1,8 +1,9 @@
-import { Avatar, Button, Paper, Typography } from "@mui/material";
+import { Avatar, Button, Paper, Tooltip, Typography } from "@mui/material";
 import NavBar from "../Components/NavBar";
 import { deepOrange } from "@mui/material/colors";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import LocationOnOutlinedIcon from "@mui/icons-material/LocationOnOutlined";
+import QuestionAnswerIcon from "@mui/icons-material/QuestionAnswer";
 import dayjs from "dayjs";
 import Footer from "../Components/Footer";
 import DescriptionDisplay from "../Components/DescriptionDisplay";
@@ -27,6 +28,8 @@ const EventDetails = () => {
   const { eventId } = useParams();
   const navigate = useNavigate();
   const {
+    event,
+    setEvent,
     allEvents,
     eventsAttending,
     eventsWaiting,
@@ -37,7 +40,6 @@ const EventDetails = () => {
   } = useContext(AppContext);
   const { jwt, isAuthenticated } = useAuth();
   const [isLoading, setIsLoading] = useState(true);
-  const [event, setEvent] = useState({});
   const [isAttending, setIsAttending] = useState(false);
   const [isWaiting, setIsWaiting] = useState(false);
   const [isFull, setIsFull] = useState(false);
@@ -133,6 +135,7 @@ const EventDetails = () => {
     }
   };
 
+  console.log("event", event);
   return (
     <>
       <NavBar />
@@ -154,24 +157,29 @@ const EventDetails = () => {
               </Typography>
               <div className="flex items-center">
                 <Avatar
+                  src={event.profileImageUrl}
                   sx={{ bgcolor: deepOrange[500] }}
                   style={{
                     width: "45px",
                     height: "45px",
                   }}
-                >
-                  {event.user[0]}
-                </Avatar>
+                />
                 <div className="ml-6">
                   <Typography variant="body2">Hosted By</Typography>
-                  <Typography
-                    variant="body2"
-                    component="button"
-                    onClick={() => navigate(`/chat/${event.userId}`)}
-                    style={{ fontWeight: "bold" }}
-                  >
-                    {event.user}
-                  </Typography>
+                  <Tooltip title="Chat with Host">
+                    <div
+                      className=" hover:text-blue-500 transition-colors duration-300 cursor-pointer space-x-2"
+                      onClick={() => navigate(`/chat/${event.userId}`)}
+                    >
+                      <Typography
+                        component="button"
+                        sx={{ fontWeight: "bold" }}
+                      >
+                        {event.user}
+                      </Typography>
+                      <QuestionAnswerIcon color="info" />
+                    </div>
+                  </Tooltip>
                 </div>
               </div>
             </div>

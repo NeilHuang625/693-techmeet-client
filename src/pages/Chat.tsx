@@ -3,7 +3,7 @@ import NavBar from "../Components/NavBar";
 import { useParams } from "react-router-dom";
 import { AppContext } from "../App";
 import { useContext, useEffect, useRef, useState } from "react";
-import { GetChatMessages, markMessagesAsRead } from "../Utils/API";
+import { markMessagesAsRead, getReceiverInfo } from "../Utils/API";
 import checkUnreadMessage from "../Utils/checkUnreadMessage";
 import groupMessagesByReceiver from "../Utils/groupMessagesByReceiver";
 import { useAuth } from "../Contexts/AuthProvider";
@@ -13,7 +13,7 @@ import relativeTime from "dayjs/plugin/relativeTime";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import Typography from "@mui/material/Typography";
-import { Button, FilledInput, IconButton, Input } from "@mui/material";
+import { FilledInput, IconButton } from "@mui/material";
 import Box from "@mui/material/Box";
 import { useNavigate } from "react-router-dom";
 import SmsIcon from "@mui/icons-material/Sms";
@@ -21,6 +21,8 @@ import Badge from "@mui/material/Badge";
 import Avatar from "@mui/material/Avatar";
 import SendIcon from "@mui/icons-material/Send";
 import { FormControl, FormHelperText, InputAdornment } from "@mui/material";
+import Loading from "../Components/Loading";
+import { User } from "../Contexts/AuthProvider";
 
 dayjs.extend(utc);
 dayjs.extend(relativeTime);
@@ -34,6 +36,8 @@ export interface MessageProps {
   receiverId: string;
   receiverNickname: string;
   senderNickname: string;
+  senderImageUrl: string;
+  receiverImageUrl: string;
 }
 
 interface TabPanelProps {
@@ -76,6 +80,7 @@ const Chat = () => {
   const { jwt, user } = useAuth();
   const userId = user?.id;
   const {
+    event,
     hubConnection,
     message,
     setMessage,
@@ -85,8 +90,13 @@ const Chat = () => {
     setMessagesAfterGroup,
   } = useContext(AppContext);
 
+  if (!messages) {
+    return <Loading />;
+  }
+
   const [value, setValue] = useState(-1);
   const [error, setError] = useState("");
+  const [receiverInfo, setReceiverInfo] = useState<User>({} as User);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const scrollToBottom = () => {
@@ -96,19 +106,7 @@ const Chat = () => {
   useEffect(scrollToBottom, [messages, receiverId, value, messagesAfterGroup]);
 
   useEffect(() => {
-    const fetchChatMessages = async () => {
-      try {
-        const response = await GetChatMessages(jwt || "", receiverId || "");
-        setMessages(response.data);
-      } catch (err) {
-        console.error(err);
-      }
-    };
-    fetchChatMessages();
-  }, [receiverId]);
-
-  useEffect(() => {
-    if (messages) {
+    if (messages && receiverId) {
       const groupedMessages = groupMessagesByReceiver(
         receiverId || "",
         userId || "",
@@ -116,9 +114,17 @@ const Chat = () => {
         messages,
         setMessages
       );
+
+      if (!groupedMessages.hasOwnProperty(receiverId)) {
+        groupedMessages[receiverId] = { messages: [], unreadCount: 0 };
+      }
       setMessagesAfterGroup(groupedMessages);
     }
-  }, [messages]);
+  }, [messages, receiverId]);
+
+  const handleChange = (event: React.SyntheticEvent, newValue: number) => {
+    setValue(newValue);
+  };
 
   useEffect(() => {
     if (receiverId) {
@@ -129,9 +135,19 @@ const Chat = () => {
     }
   }, [messagesAfterGroup, receiverId]);
 
-  const handleChange = (event: React.SyntheticEvent, newValue: number) => {
-    setValue(newValue);
-  };
+  useEffect(() => {
+    const fetchReceiverInfo = async () => {
+      try {
+        const response = await getReceiverInfo(jwt || "", receiverId || "");
+        setReceiverInfo(response.data);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+    if (receiverId) {
+      fetchReceiverInfo();
+    }
+  }, [receiverId]);
 
   const sendMessage = async () => {
     if (message.trim() === "") {
@@ -168,6 +184,8 @@ const Chat = () => {
       console.error(err);
     }
   };
+
+  console.log("receiverInfo", receiverInfo);
 
   return (
     <div className="flex flex-col h-full">
@@ -220,6 +238,13 @@ const Chat = () => {
                         <Avatar
                           sx={{ borderRadius: "20%" }}
                           variant="rounded"
+                          src={
+                            messages.length === 0
+                              ? event.profileImageUrl
+                              : messages[0]?.senderId === userId
+                              ? messages[0]?.receiverImageUrl
+                              : messages[0]?.senderImageUrl
+                          }
                         />
                       </div>
                       <div className="col-span-4 middle flex flex-col flex-grow">
@@ -232,9 +257,11 @@ const Chat = () => {
                             fontWeight: "bold",
                           }}
                         >
-                          {messages[0].senderId === userId
-                            ? messages[0].receiverNickname
-                            : messages[0].senderNickname}
+                          {messages.length === 0
+                            ? receiverInfo.nickname
+                            : messages[0]?.senderId === userId
+                            ? messages[0]?.receiverNickname
+                            : messages[0]?.senderNickname}
                         </div>
                         <div
                           style={{
@@ -244,7 +271,7 @@ const Chat = () => {
                           }}
                           className="chat-message overflow-hidden whitespace-nowrap text-ellipsis"
                         >
-                          {messages[messages.length - 1].content}
+                          {messages[messages.length - 1]?.content}
                         </div>
                       </div>
                       <div className="col-span-5 right mx-2">
@@ -257,7 +284,7 @@ const Chat = () => {
                         >
                           {dayjs(
                             dayjs
-                              .utc(messages[messages.length - 1].createdAt)
+                              .utc(messages[messages.length - 1]?.createdAt)
                               .local()
                               .format()
                           ).fromNow()}
@@ -277,12 +304,7 @@ const Chat = () => {
             )}
           </Tabs>
           <div className="flex flex-col w-[530px] h-full">
-            <TabPanel
-              value={value}
-              index={-1}
-              key={`tabpanel-${receiverId}-${-1}`}
-              style={{ overflowY: "scroll" }}
-            >
+            <TabPanel value={value} index={-1}>
               <div className="flex justify-center">
                 <SmsIcon style={{ fontSize: 200 }} />
               </div>
@@ -299,7 +321,7 @@ const Chat = () => {
                   value={value}
                   index={index}
                   key={`tabpanel-${receiverId}-${index}`}
-                  style={{ overflowY: "scroll" }}
+                  style={{ overflowY: "scroll", flexGrow: 1 }}
                 >
                   {messages.map((message: MessageProps) => (
                     <div key={message.id} className="flex flex-col w-full my-4">
@@ -315,6 +337,7 @@ const Chat = () => {
                             sx={{ width: 38, height: 38, borderRadius: "30%" }}
                             style={{ marginRight: "5px" }}
                             variant="rounded"
+                            src={message.senderImageUrl}
                           />
                         )}
                         <div
@@ -332,6 +355,7 @@ const Chat = () => {
                             sx={{ width: 38, height: 38, borderRadius: "30%" }}
                             style={{ marginLeft: "5px" }}
                             variant="rounded"
+                            src={message.senderImageUrl}
                           />
                         )}
                       </div>

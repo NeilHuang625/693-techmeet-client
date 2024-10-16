@@ -28,6 +28,9 @@ import {
   Menu,
   MenuItem,
   Divider,
+  InputLabel,
+  Input,
+  FormHelperText,
 } from "@mui/material";
 import { useFormik } from "formik";
 import { signup, logout, login } from "../Utils/API";
@@ -47,6 +50,7 @@ const AccountMenu = () => {
   const open = Boolean(anchorEl);
 
   const [openSignupDialog, setOpenSignupDialog] = useState(false);
+  const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null);
 
   // Signup form
   const formik = useFormik({
@@ -55,12 +59,21 @@ const AccountMenu = () => {
       password: "",
       nickname: "",
       confirmPassword: "",
+      imageFile: null,
     },
     validationSchema: signupValidationSchema,
     onSubmit: async (values, { setErrors, resetForm }) => {
-      const { confirmPassword, ...rest } = values;
+      const { confirmPassword, imageFile, ...rest } = values;
+      const formData = new FormData();
+
+      for (const key in rest) {
+        formData.append(key, rest[key]);
+      }
+
+      formData.append("imageFile", imageFile as File);
+
       try {
-        const response = await signup(rest);
+        const response = await signup(formData);
         const jwt = response.data.token.result;
         const resUser = response.data.user;
         setJwt(jwt);
@@ -165,11 +178,10 @@ const AccountMenu = () => {
               aria-haspopup="true"
               aria-expanded={open ? "true" : undefined}
             >
-              <Avatar sx={{ width: 32, height: 32 }}>
-                {user?.nickname
-                  ? user.nickname.substring(0, 2)
-                  : user?.email.substring(0, 2)}
-              </Avatar>
+              <Avatar
+                sx={{ width: 42, height: 42 }}
+                src={user?.profileImageUrl}
+              />
             </IconButton>
           </Tooltip>
         </Box>
@@ -239,7 +251,9 @@ const AccountMenu = () => {
               margin="dense"
               onChange={formik.handleChange}
               value={formik.values.nickname}
+              error={formik.touched.nickname && Boolean(formik.errors.nickname)}
               fullWidth
+              helperText={formik.touched.nickname && formik.errors.nickname}
             />
             <TextField
               margin="dense"
@@ -270,6 +284,63 @@ const AccountMenu = () => {
               type="password"
               fullWidth
             />
+            <div
+              className={`flex border border-gray-300 rounded mt-2 pl-3 py-1 space-x-32 ${
+                formik.touched.imageFile && formik.errors.imageFile
+                  ? "border-red-500"
+                  : ""
+              }`}
+            >
+              <div className="flex flex-col">
+                <InputLabel className="w-[108px] my-2" htmlFor="imageFile">
+                  Profile Image
+                </InputLabel>
+                <Input
+                  className="w-[250px]"
+                  type="file"
+                  id="imageFile"
+                  name="imageFile"
+                  onChange={(e) => {
+                    const target = e.currentTarget as HTMLInputElement;
+                    const file: File = (target.files as FileList)[0];
+                    if (file) {
+                      formik.setFieldValue("imageFile", file);
+                      const url = URL.createObjectURL(file);
+                      setImagePreviewUrl(url);
+                    } else {
+                      formik.setFieldValue("imageFile", null);
+                      setImagePreviewUrl(null);
+                    }
+                  }}
+                  error={
+                    formik.touched.imageFile && Boolean(formik.errors.imageFile)
+                  }
+                />
+                {formik.touched.imageFile && formik.errors.imageFile && (
+                  <FormHelperText error>
+                    {formik.errors.imageFile}
+                  </FormHelperText>
+                )}
+              </div>
+              <div className="w-[100px] h-[100px]">
+                {imagePreviewUrl ? (
+                  <img
+                    src={imagePreviewUrl}
+                    alt="Profile Photo"
+                    style={{ width: "100px", height: "100px" }}
+                  />
+                ) : (
+                  <Box
+                    sx={{
+                      width: "100px",
+                      height: "100px",
+                      border: "1px dashed gray",
+                      backgroundColor: "#e2e8f0",
+                    }}
+                  />
+                )}
+              </div>
+            </div>
             <Button type="submit" variant="text" style={{ marginTop: "30px" }}>
               Sign Up
             </Button>
@@ -409,7 +480,7 @@ const AccountMenu = () => {
           </ListItemIcon>
           {user?.email}
         </MenuItem>
-        <MenuItem>
+        <MenuItem onClick={() => navigate("/profile")}>
           <ListItemIcon>
             <PersonOutlineIcon fontSize="small" />
           </ListItemIcon>
