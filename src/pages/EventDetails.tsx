@@ -38,7 +38,7 @@ const EventDetails = () => {
     setUpdateAllEvents,
     setOpenLoginDialog,
   } = useContext(AppContext);
-  const { jwt, isAuthenticated } = useAuth();
+  const { jwt, isAuthenticated, user } = useAuth();
   const [isLoading, setIsLoading] = useState(true);
   const [isAttending, setIsAttending] = useState(false);
   const [isWaiting, setIsWaiting] = useState(false);
@@ -166,20 +166,25 @@ const EventDetails = () => {
                 />
                 <div className="ml-6">
                   <Typography variant="body2">Hosted By</Typography>
-                  <Tooltip title="Chat with Host">
-                    <div
-                      className=" hover:text-blue-500 transition-colors duration-300 cursor-pointer space-x-2"
-                      onClick={() => navigate(`/chat/${event.userId}`)}
-                    >
-                      <Typography
-                        component="button"
-                        sx={{ fontWeight: "bold" }}
+                  {user.id === event.userId ? (
+                    <Typography sx={{ fontWeight: "bold" }}>You</Typography>
+                  ) : (
+                    <Tooltip title="Chat with Host">
+                      <div
+                        className="flex space-x-2  hover:text-blue-500 transition-colors duration-300 cursor-pointer"
+                        onClick={() => {
+                          if (user?.id !== event.userId) {
+                            navigate(`/chat/${event.userId}`);
+                          }
+                        }}
                       >
-                        {event.user}
-                      </Typography>
-                      <QuestionAnswerIcon color="info" />
-                    </div>
-                  </Tooltip>
+                        <Typography sx={{ fontWeight: "bold" }}>
+                          {event.user}
+                        </Typography>
+                        <QuestionAnswerIcon color="info" />
+                      </div>
+                    </Tooltip>
+                  )}
                 </div>
               </div>
             </div>
