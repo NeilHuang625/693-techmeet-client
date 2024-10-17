@@ -95,7 +95,14 @@ const Message = () => {
               >
                 <div className="grid grid-cols-11 w-full items-center">
                   <div className="col-span-2 left">
-                    <Avatar />
+                    <Avatar
+                      variant="rounded"
+                      src={
+                        messages[messages.length - 1].senderId === userId
+                          ? messages[messages.length - 1].receiverImageUrl
+                          : messages[messages.length - 1].senderImageUrl
+                      }
+                    />
                   </div>
                   <div className="col-span-4 middle flex flex-col flex-grow">
                     <div className="chat-name ">
