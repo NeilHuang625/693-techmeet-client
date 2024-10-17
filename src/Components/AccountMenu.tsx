@@ -13,6 +13,7 @@ import AppRegistrationIcon from "@mui/icons-material/AppRegistration";
 import PersonOutlineIcon from "@mui/icons-material/PersonOutline";
 import MailOutlineIcon from "@mui/icons-material/MailOutline";
 import { toast } from "react-toastify";
+import { AxiosError, AxiosResponse } from "axios";
 import {
   Avatar,
   Button,
@@ -52,6 +53,14 @@ const AccountMenu = () => {
   const [openSignupDialog, setOpenSignupDialog] = useState(false);
   const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null);
 
+  interface Values {
+    email: string;
+    password: string;
+    nickname: string;
+    confirmPassword: string;
+    imageFile: File | null;
+  }
+
   // Signup form
   const formik = useFormik({
     initialValues: {
@@ -62,12 +71,12 @@ const AccountMenu = () => {
       imageFile: null,
     },
     validationSchema: signupValidationSchema,
-    onSubmit: async (values, { setErrors, resetForm }) => {
+    onSubmit: async (values: Values, { setErrors, resetForm }) => {
       const { confirmPassword, imageFile, ...rest } = values;
       const formData = new FormData();
 
       for (const key in rest) {
-        formData.append(key, rest[key]);
+        formData.append(key, rest[key as keyof typeof rest]);
       }
 
       formData.append("imageFile", imageFile as File);
@@ -83,9 +92,15 @@ const AccountMenu = () => {
         setOpenSignupDialog(false);
         resetForm();
         toast.success("Signup successfully");
-      } catch (err) {
-        if (err.response && err.response.status === 400) {
-          setErrors({ email: "Email alreday in use, try a new one" });
+      } catch (err: unknown) {
+        if (err instanceof Error && "response" in err) {
+          const axiosError = err as AxiosError;
+          if (axiosError.response && "status" in axiosError.response) {
+            const axiosResponse = axiosError.response as AxiosResponse;
+            if (axiosResponse.status === 400) {
+              setErrors({ email: "Email already in use, try a new one" });
+            }
+          }
         }
       }
     },
@@ -110,11 +125,14 @@ const AccountMenu = () => {
         resetForm();
         toast.success("Login successfully");
       } catch (err) {
-        if (err.response && err.response.status === 400) {
-          setErrors({
-            email: "Invalid email or password",
-            password: "Invalid email or password",
-          });
+        if (err instanceof Error && "response" in err) {
+          const axiosError = err as AxiosError;
+          if (axiosError.response && axiosError.response.status === 400) {
+            setErrors({
+              email: "Invalid email or password",
+              password: "Invalid email or password",
+            });
+          }
         }
       }
     },
@@ -131,7 +149,7 @@ const AccountMenu = () => {
   const handleLogout = async () => {
     const jwt = localStorage.getItem("jwt");
     try {
-      const response = await logout(jwt);
+      const response = await logout(jwt || "");
       if (response.status === 200) {
         localStorage.removeItem("jwt");
         setJwt(null);

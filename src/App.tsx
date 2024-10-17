@@ -23,7 +23,7 @@ import {
 import { createContext, useEffect, useState } from "react";
 import { useAuth } from "./Contexts/AuthProvider";
 import dayjs from "dayjs";
-import utc from "dayjs-plugin-utc";
+import utc from "dayjs/plugin/utc";
 import * as signalR from "@microsoft/signalr";
 import { MessageProps } from "./pages/Chat";
 
@@ -136,7 +136,7 @@ function App() {
     const fetchEvents = async () => {
       try {
         const response = await getAllEvents();
-        const eventsWithLocalTime = response.data.map((event) => ({
+        const eventsWithLocalTime = response.data.map((event: AppEvent) => ({
           ...event,
           startTime: dayjs
             .utc(event.startTime)
@@ -158,14 +158,17 @@ function App() {
     setPromotedEvents(getPromotedEvents);
     const getCities = Array.from(new Set(allEvents.map((event) => event.city)));
     setCities(getCities);
-    const categoryCounts = allEvents.reduce((acc, event) => {
-      if (!acc[event.category]) {
-        acc[event.category] = 1;
-      } else {
-        acc[event.category] += 1;
-      }
-      return acc;
-    }, {});
+    const categoryCounts = allEvents.reduce(
+      (acc: { [key: string]: number }, event) => {
+        if (!acc[event.category]) {
+          acc[event.category] = 1;
+        } else {
+          acc[event.category] += 1;
+        }
+        return acc;
+      },
+      {}
+    );
     const getCategoryCountsArray = Object.entries(categoryCounts).map(
       ([key, value]) => ({ category: key, count: value })
     );
@@ -173,19 +176,25 @@ function App() {
     if (isAuthenticated) {
       const fetchUserEvents = async () => {
         try {
-          const eventsBasedOnUser = await getUserEvents(jwt, user?.id);
-          const eventsAttending = allEvents.filter((e) =>
-            eventsBasedOnUser.data.attendingEvents.includes(e.id)
-          );
-          const eventsWaiting = allEvents.filter((e) =>
-            eventsBasedOnUser.data.waitlistedEvents.includes(e.id)
-          );
-          setEventsAttending(eventsAttending);
-          setEventsWaiting(eventsWaiting);
+          if (jwt && user && user.id) {
+            const eventsBasedOnUser = await getUserEvents(jwt, user?.id);
+            const eventsAttending = allEvents.filter((e) =>
+              eventsBasedOnUser.data.attendingEvents.includes(e.id)
+            );
+            const eventsWaiting = allEvents.filter((e) =>
+              eventsBasedOnUser.data.waitlistedEvents.includes(e.id)
+            );
+            setEventsAttending(eventsAttending);
+            setEventsWaiting(eventsWaiting);
 
-          // Get the events that created by the user
-          const eventsCreated = allEvents.filter((e) => e.userId === user?.id);
-          setEventsCreated(eventsCreated);
+            // Get the events that created by the user
+            const eventsCreated = allEvents.filter(
+              (e) => e.userId === user?.id
+            );
+            setEventsCreated(eventsCreated);
+          } else {
+            console.log("jwt or user is null");
+          }
         } catch (err) {
           console.log(err);
         }
@@ -199,16 +208,20 @@ function App() {
     if (!isAuthenticated) return;
     const fetchNotifications = async () => {
       try {
-        const response = await getAllNotifications(jwt);
-        console.log("utc", response.data);
-        const notificationsWithLocalTime = response.data.map(
-          (n: Notification) => ({
-            ...n,
-            createdAt: dayjs.utc(n.createdAt).local().format(),
-          })
-        );
-        console.log("local", notificationsWithLocalTime);
-        setNotifications(notificationsWithLocalTime);
+        if (jwt) {
+          const response = await getAllNotifications(jwt);
+          console.log("utc", response.data);
+          const notificationsWithLocalTime = response.data.map(
+            (n: Notification) => ({
+              ...n,
+              createdAt: dayjs.utc(n.createdAt).local().format(),
+            })
+          );
+          console.log("local", notificationsWithLocalTime);
+          setNotifications(notificationsWithLocalTime);
+        } else {
+          console.log("JWT is not defined");
+        }
       } catch (err) {
         console.log(err);
       }
