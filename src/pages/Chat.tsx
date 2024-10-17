@@ -5,7 +5,6 @@ import { AppContext } from "../App";
 import { useContext, useEffect, useRef, useState } from "react";
 import { markMessagesAsRead, getReceiverInfo } from "../Utils/API";
 import checkUnreadMessage from "../Utils/checkUnreadMessage";
-import groupMessagesByReceiver from "../Utils/groupMessagesByReceiver";
 import { useAuth } from "../Contexts/AuthProvider";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
@@ -107,12 +106,54 @@ const Chat = () => {
 
   useEffect(() => {
     if (messages && receiverId) {
-      const groupedMessages = groupMessagesByReceiver(
-        receiverId || "",
-        userId || "",
-        jwt || "",
-        messages,
-        setMessages
+      const groupedMessages = messages.reduce(
+        (
+          acc: {
+            [key: string]: { messages: MessageProps[]; unreadCount: number };
+          },
+          message: MessageProps
+        ) => {
+          let otherUserId = null;
+          if (message.receiverId === userId) {
+            otherUserId = message.senderId;
+          } else if (message.senderId === userId) {
+            otherUserId = message.receiverId;
+          }
+
+          if (otherUserId) {
+            if (!acc[otherUserId]) {
+              acc[otherUserId] = { messages: [], unreadCount: 0 };
+            }
+            acc[otherUserId].messages.push(message);
+
+            // If the message is unread, and the receiver is the current user, and currently not chatting with this sender, increment the unread count.
+            if (
+              !message.isRead &&
+              message.receiverId === userId &&
+              message.senderId !== receiverId
+            ) {
+              acc[otherUserId].unreadCount += 1;
+            } else if (
+              !message.isRead &&
+              message.receiverId === userId &&
+              message.senderId === receiverId
+            ) {
+              setMessages((preMessages: MessageProps[]) =>
+                preMessages.map((m: MessageProps) =>
+                  m.id === message.id ? { ...m, isRead: true } : m
+                )
+              );
+              try {
+                markMessagesAsRead(jwt || "", receiverId || "");
+              } catch (err) {
+                console.error(err);
+              }
+            }
+          }
+
+          return acc;
+        },
+        {}
       );
 
       if (!groupedMessages.hasOwnProperty(receiverId)) {
@@ -122,7 +163,7 @@ const Chat = () => {
     }
   }, [messages, receiverId]);
 
-  const handleChange = (event: React.SyntheticEvent, newValue: number) => {
+  const handleChange = (_event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
   };
 
@@ -240,7 +281,7 @@ const Chat = () => {
                           variant="rounded"
                           src={
                             messages.length === 0
-                              ? event.profileImageUrl
+                              ? event?.profileImageUrl
                               : messages[0]?.senderId === userId
                               ? messages[0]?.receiverImageUrl
                               : messages[0]?.senderImageUrl
@@ -304,7 +345,7 @@ const Chat = () => {
             )}
           </Tabs>
           <div className="flex flex-col w-[530px] h-full">
-            <TabPanel value={value} index={-1}>
+            <TabPanel value={value} index={-1} style={{}}>
               <div className="flex justify-center">
                 <SmsIcon style={{ fontSize: 200 }} />
               </div>
@@ -316,7 +357,7 @@ const Chat = () => {
               </Typography>
             </TabPanel>
             {Object.entries(messagesAfterGroup).map(
-              ([receiverId, { messages, unreadCount }], index) => (
+              ([receiverId, { messages }], index) => (
                 <TabPanel
                   value={value}
                   index={index}

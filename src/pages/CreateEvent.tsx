@@ -109,11 +109,17 @@ const CreateEvent = () => {
     },
   });
 
+  interface AddressComponent {
+    long_name: string;
+    short_name: string;
+    types: string[];
+  }
+
   const { ref } = usePlacesWidget({
     apiKey: import.meta.env.VITE_GOOGLE_API_KEY,
     onPlaceSelected: (place) => {
-      const city = place.address_components.find((component) =>
-        component.types.includes("locality")
+      const city = place.address_components.find(
+        (component: AddressComponent) => component.types.includes("locality")
       ).long_name;
       const address = place.formatted_address;
       createEventForm.setFieldValue("location", address);
@@ -377,7 +383,7 @@ const CreateEvent = () => {
                 <FormControlLabel
                   control={
                     <Checkbox
-                      color="black"
+                      color="default"
                       id="promoted"
                       name="promoted"
                       checked={createEventForm.values.promoted}

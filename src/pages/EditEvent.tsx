@@ -57,12 +57,11 @@ const EditEvent = () => {
     formData.append("ImageFile", newEvent.imageFile as File);
 
     try {
-      const response = await updateEvent(jwt, event.id, formData);
-      if (response.status === 200) {
-        setUpdateAllEvents((pre) => !pre);
-        navigate("/events-posted");
-        toast.success("Event updated successfully");
-      }
+      if (!jwt) return;
+      await updateEvent(jwt, event.id, formData);
+      setUpdateAllEvents((pre) => !pre);
+      navigate("/events-posted");
+      toast.success("Event updated successfully");
     } catch (err) {
       console.log(err);
     }
@@ -126,8 +125,8 @@ const EditEvent = () => {
   const { ref } = usePlacesWidget({
     apiKey: import.meta.env.VITE_GOOGLE_API_KEY,
     onPlaceSelected: (place) => {
-      const city = place.address_components.find((component) =>
-        component.types.includes("locality")
+      const city = place.address_components.find(
+        (component: { types: string[] }) => component.types.includes("locality")
       ).long_name;
       const address = place.formatted_address;
       editEventForm.setFieldValue("location", address);

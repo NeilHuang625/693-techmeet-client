@@ -1,5 +1,5 @@
 import { logout, refreshToken } from "../Utils/API";
-import { jwtDecode } from "jwt-decode";
+import { JwtPayload, jwtDecode } from "jwt-decode";
 import {
   useState,
   useEffect,
@@ -34,6 +34,14 @@ interface AuthProviderProps {
   children: React.ReactNode;
 }
 
+interface ExtendedJwtPayload extends JwtPayload {
+  "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name": string;
+  "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier": string;
+  "http://schemas.microsoft.com/ws/2008/06/identity/claims/role": string;
+  "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname": string;
+  ProfilePhotoUrl: string;
+}
+
 const AuthContext = createContext<AuthContextType>({
   isAuthenticated: false,
   setIsAuthenticated: () => {},
@@ -43,8 +51,8 @@ const AuthContext = createContext<AuthContextType>({
   jwt: null,
   setJwt: () => {},
   isExtendDialogOpen: false,
-  handleLogout: async (jwt: string) => {},
-  handleJwtRefresh: async (jwt: string) => {},
+  handleLogout: async () => {},
+  handleJwtRefresh: async () => {},
   timeAhead: 0,
 });
 
@@ -54,10 +62,9 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [isExtendDialogOpen, setIsExtendDialogOpen] = useState(false);
   const [jwt, setJwt] = useState<string | null>(localStorage.getItem("jwt"));
   const [isLoading, setIsLoading] = useState(true);
-
   const checkIsJwtExpired = (jwt: string) => {
     const decodedJwt = jwtDecode(jwt);
-    const expireTimeInMs = decodedJwt.exp * 1000;
+    const expireTimeInMs = decodedJwt.exp ? decodedJwt.exp * 1000 : 0;
     const currentTimeInMs = new Date().getTime();
     return currentTimeInMs >= expireTimeInMs;
   };
@@ -82,7 +89,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         localStorage.setItem("jwt", jwt);
         setIsAuthenticated(true);
 
-        const decodedJwt = jwtDecode(jwt);
+        const decodedJwt = jwtDecode<ExtendedJwtPayload>(jwt);
         // Extract the user data from the decoded JWT
         const userData = {
           email:
@@ -105,7 +112,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         setUser(userData);
         setIsLoading(false);
 
-        const expireTimeInMs = decodedJwt.exp * 1000;
+        const expireTimeInMs = decodedJwt.exp ? decodedJwt.exp * 1000 : 0;
         const currentTimeInMs = new Date().getTime();
         const timeLeft = expireTimeInMs - currentTimeInMs;
         const timer = setTimeout(() => {

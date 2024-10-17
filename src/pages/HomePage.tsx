@@ -6,7 +6,11 @@ import Footer from "../Components/Footer";
 import { AppContext } from "../App";
 import { useContext } from "react";
 
-const HomePage = ({ handleFilterClick }) => {
+export interface HomePageProps {
+  handleFilterClick: () => void;
+}
+
+const HomePage = ({ handleFilterClick }: HomePageProps) => {
   const { events } = useContext(AppContext);
   return (
     <>

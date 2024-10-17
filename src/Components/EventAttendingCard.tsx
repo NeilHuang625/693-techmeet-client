@@ -5,15 +5,19 @@ import timezone from "dayjs/plugin/timezone";
 import advancedFormat from "dayjs/plugin/advancedFormat";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import HourglassTopIcon from "@mui/icons-material/HourglassTop";
-import { AppContext } from "../App";
-import { useContext } from "react";
+import { AppContext, AppEvent } from "../App";
+import React, { useContext } from "react";
 import { useNavigate } from "react-router-dom";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
 dayjs.extend(advancedFormat);
 
-const EventAttendingCard = ({ event }) => {
+interface EventAttendingCardProps {
+  event: AppEvent;
+}
+
+const EventAttendingCard: React.FC<EventAttendingCardProps> = ({ event }) => {
   const navigate = useNavigate();
   const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
   const currentTime = new Date();

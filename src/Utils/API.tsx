@@ -106,7 +106,7 @@ export const getUserEvents = async (jwt: string, userId: string) => {
 };
 
 // Attend Event
-export const attendEvent = async (jwt: string, eventId: string) => {
+export const attendEvent = async (jwt: string, eventId: number) => {
   const response = await axios.post(
     `${basicURL}/event/attend/${eventId}`,
     {},
@@ -121,7 +121,7 @@ export const attendEvent = async (jwt: string, eventId: string) => {
 };
 
 // Withdraw Event
-export const withdrawEvent = async (jwt: string, eventId: string) => {
+export const withdrawEvent = async (jwt: string, eventId: number) => {
   const response = await axios.delete(`${basicURL}/event/withdraw/${eventId}`, {
     headers: {
       Authorization: `Bearer ${jwt}`,
@@ -147,7 +147,7 @@ export const addToWaitlist = async (jwt: string, eventId: string) => {
 };
 
 // Cancel Waitlist
-export const cancelWaitlist = async (jwt: string, eventId: string) => {
+export const cancelWaitlist = async (jwt: string, eventId: number) => {
   const response = await axios.delete(`${basicURL}/event/waitlist/${eventId}`, {
     headers: {
       Authorization: `Bearer ${jwt}`,
@@ -158,7 +158,7 @@ export const cancelWaitlist = async (jwt: string, eventId: string) => {
 };
 
 // Delete Event
-export const deleteEvent = async (jwt: string, eventId: string) => {
+export const deleteEvent = async (jwt: string, eventId: number) => {
   const response = await axios.delete(`${basicURL}/event/${eventId}`, {
     headers: {
       Authorization: `Bearer ${jwt}`,

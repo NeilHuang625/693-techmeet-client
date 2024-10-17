@@ -26,6 +26,7 @@ import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import * as signalR from "@microsoft/signalr";
 import { MessageProps } from "./pages/Chat";
+import React from "react";
 
 export interface AppEvent {
   id: number;
@@ -43,6 +44,7 @@ export interface AppEvent {
   categoryId: number;
   category: string;
   profileImageUrl: string;
+  user: string;
 }
 
 interface Notification {
@@ -67,25 +69,25 @@ export interface AppContextType {
   selectedDate: string;
   setSelectedDate: (date: string) => void;
   allEvents: AppEvent[];
-  setAllEvents: (events: AppEvent[]) => void;
+  setAllEvents: React.Dispatch<React.SetStateAction<AppEvent[]>>;
   promotedEvents: AppEvent[];
   cities: string[];
   categoryCountsArray: { category: string; count: number }[];
   eventsAttending: AppEvent[];
   setEventsAttending: (events: AppEvent[]) => void;
   eventsWaiting: AppEvent[];
-  setEventsWaiting: (events: AppEvent[]) => void;
+  setEventsWaiting: React.Dispatch<React.SetStateAction<AppEvent[]>>;
   eventsCreated: AppEvent[];
   setEventsCreated: (events: AppEvent[]) => void;
   openLoginDialog: boolean;
   setOpenLoginDialog: (open: boolean) => void;
-  setUpdateAllEvents: (update: boolean) => void;
+  setUpdateAllEvents: React.Dispatch<React.SetStateAction<boolean>>;
   notifications: Notification[];
   setNotifications: (notifications: Notification[]) => void;
   message: string;
   setMessage: (message: string) => void;
   messages: MessageProps[];
-  setMessages: (messages: MessageProps[]) => void;
+  setMessages: React.Dispatch<React.SetStateAction<MessageProps[]>>;
   hubConnection: signalR.HubConnection | undefined;
   messagesAfterGroup: {
     [key: string]: { messages: MessageProps[]; unreadCount: number };
@@ -96,13 +98,13 @@ export interface AppContextType {
   totalUnreadCount: number;
   setTotalUnreadCount: (count: number) => void;
   event: AppEvent | undefined;
-  setEvent: (event: AppEvent | undefined) => void;
+  setEvent: React.Dispatch<React.SetStateAction<AppEvent | undefined>>;
 }
 
 export const AppContext = createContext({} as AppContextType);
 
 function App() {
-  const [allEvents, setAllEvents] = useState<AppEvent[]>([]);
+  const [allEvents, setAllEvents] = React.useState<AppEvent[]>([]);
   const [events, setEvents] = useState<AppEvent[]>([]);
   const [promotedEvents, setPromotedEvents] = useState<AppEvent[]>([]);
   const [cities, setCities] = useState<string[]>([]);
@@ -119,14 +121,14 @@ function App() {
   const [eventsWaiting, setEventsWaiting] = useState<AppEvent[]>([]); // Array of event IDs
   const [eventsCreated, setEventsCreated] = useState<AppEvent[]>([]);
   const [openLoginDialog, setOpenLoginDialog] = useState(false);
-  const [updateAllEvents, setUpdateAllEvents] = useState(false);
+  const [updateAllEvents, setUpdateAllEvents] = useState<boolean>(false);
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [message, setMessage] = useState("");
-  const [messages, setMessages] = useState<MessageProps[]>([]);
+  const [messages, setMessages] = React.useState<MessageProps[]>([]);
   const [hubConnection, setHubConnection] = useState<signalR.HubConnection>(); // SignalR connection for sending messages
   const [messagesAfterGroup, setMessagesAfterGroup] = useState({});
   const [totalUnreadCount, setTotalUnreadCount] = useState(0);
-  const [event, setEvent] = useState<AppEvent>();
+  const [event, setEvent] = React.useState<AppEvent>();
 
   const { isAuthenticated, user, isLoading, jwt } = useAuth();
 

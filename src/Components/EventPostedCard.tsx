@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
+import React, { useState } from "react";
 import { Button, Stack, Typography } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
@@ -10,8 +10,13 @@ import { toast } from "react-toastify";
 import { AppContext } from "../App";
 import { useContext } from "react";
 import ConfirmDialog from "./Dialogs/ConfirmDialog";
+import { AppEvent } from "../App";
 
-const EventPostedCard = ({ event }) => {
+interface EventPostedCardProps {
+  event: AppEvent;
+}
+
+const EventPostedCard: React.FC<EventPostedCardProps> = ({ event }) => {
   const navigate = useNavigate();
   const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
   const currentTime = new Date();
@@ -23,12 +28,13 @@ const EventPostedCard = ({ event }) => {
 
   const handleEventDelete = async () => {
     try {
-      const response = await deleteEvent(jwt, event.id);
-      if (response.status === 200) {
-        setAllEvents(allEvents.filter((e) => e.id !== event.id));
-        setOpenDeleteDialog(false);
-        toast.success("Event deleted successfully");
+      if (!jwt) {
+        return;
       }
+      await deleteEvent(jwt, event.id);
+      setAllEvents(allEvents.filter((e) => e.id !== event.id));
+      setOpenDeleteDialog(false);
+      toast.success("Event deleted successfully");
     } catch (error) {
       console.error(error);
     }

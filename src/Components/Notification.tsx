@@ -98,7 +98,9 @@ const Notification = () => {
                             {dayjs(n.createdAt).fromNow()}
                           </Typography>
                           <Button
-                            onClick={() => handleButtonClick(jwt, n.id)}
+                            onClick={() => {
+                              if (jwt) handleButtonClick(jwt, n.id);
+                            }}
                             variant="text"
                             size="small"
                             style={{
@@ -152,7 +154,9 @@ const Notification = () => {
                             {dayjs(n.createdAt).fromNow()}
                           </Typography>
                           <Button
-                            onClick={() => handleButtonClick(jwt, n.id)}
+                            onClick={() => {
+                              if (jwt) handleButtonClick(jwt, n.id);
+                            }}
                             variant="text"
                             size="small"
                             style={{

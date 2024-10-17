@@ -7,7 +7,7 @@ import { useContext } from "react";
 const EventsAttending = () => {
   const { eventsAttending, eventsWaiting } = useContext(AppContext);
   const allEvents = [...eventsAttending, ...eventsWaiting].sort(
-    (a, b) => new Date(a.startTime) - new Date(b.startTime)
+    (a, b) => new Date(a.startTime).getTime() - new Date(b.startTime).getTime()
   );
   return (
     <div className="flex flex-col min-h-screen">

@@ -10,7 +10,7 @@ import DescriptionDisplay from "../Components/DescriptionDisplay";
 import { useAuth } from "../Contexts/AuthProvider";
 
 import { useParams } from "react-router-dom";
-import { AppContext } from "../App";
+import { AppContext, AppEvent } from "../App";
 import { useContext, useEffect, useState } from "react";
 import Loading from "../Components/Loading";
 import checkIsPastEvent from "../Utils/CheckIsPastEvent";
@@ -52,7 +52,9 @@ const EventDetails = () => {
     if (allEvents.length > 0) {
       const event = allEvents.find((event) => event.id === Number(eventId));
       const isPastEvent = checkIsPastEvent(event);
-      const isFull = event.maxAttendees - event.currentAttendees === 0;
+      const isFull = event
+        ? event.maxAttendees - event.currentAttendees === 0
+        : false;
       setEvent(event);
       if (isAuthenticated) {
         setIsAttending(
@@ -71,14 +73,14 @@ const EventDetails = () => {
     }
   }, [allEvents, eventId, eventsAttending, eventsWaiting]);
 
-  const handleEventAttending = async (jwt: string, eventId: string) => {
+  const handleEventAttending = async (jwt: string, eventId: number) => {
     try {
       const response = await attendEvent(jwt, eventId);
       if (response.status === 200) {
         toast.success("Event attended successfully");
-        setUpdateAllEvents((pre) => !pre);
-        setAllEvents((pre) =>
-          pre.map((event) =>
+        setUpdateAllEvents((pre: boolean) => !pre);
+        setAllEvents((pre: AppEvent[]) =>
+          pre.map((event: AppEvent) =>
             event.id === Number(eventId)
               ? { ...event, currentAttendees: response.data.currentAttendees }
               : event
@@ -91,7 +93,7 @@ const EventDetails = () => {
     }
   };
 
-  const handleWithdraw = async (jwt: string, eventId: string) => {
+  const handleWithdraw = async (jwt: string, eventId: number) => {
     try {
       const response = await withdrawEvent(jwt, eventId);
       if (response.status === 200) {
@@ -116,14 +118,14 @@ const EventDetails = () => {
       const response = await addToWaitlist(jwt, eventId);
       if (response.status === 200) {
         toast.success("Event added to waitlist successfully");
-        setEventsWaiting((pre) => [...pre, event]);
+        if (event) setEventsWaiting((pre: AppEvent[]) => [...pre, event]);
       }
     } catch (err) {
       console.error(err);
     }
   };
 
-  const handleCancelWaitlist = async (jwt: string, eventId: string) => {
+  const handleCancelWaitlist = async (jwt: string, eventId: number) => {
     try {
       const response = await cancelWaitlist(jwt, eventId);
       if (response.status === 200) {
@@ -153,11 +155,11 @@ const EventDetails = () => {
                 }}
                 gutterBottom
               >
-                {event.title}
+                {event?.title}
               </Typography>
               <div className="flex items-center">
                 <Avatar
-                  src={event.profileImageUrl}
+                  src={event?.profileImageUrl}
                   sx={{ bgcolor: deepOrange[500] }}
                   style={{
                     width: "45px",
@@ -166,20 +168,20 @@ const EventDetails = () => {
                 />
                 <div className="ml-6">
                   <Typography variant="body2">Hosted By</Typography>
-                  {user.id === event.userId ? (
+                  {user?.id === event?.userId ? (
                     <Typography sx={{ fontWeight: "bold" }}>You</Typography>
                   ) : (
                     <Tooltip title="Chat with Host">
                       <div
                         className="flex space-x-2  hover:text-blue-500 transition-colors duration-300 cursor-pointer"
                         onClick={() => {
-                          if (user?.id !== event.userId) {
-                            navigate(`/chat/${event.userId}`);
+                          if (user?.id !== event?.userId) {
+                            navigate(`/chat/${event?.userId}`);
                           }
                         }}
                       >
                         <Typography sx={{ fontWeight: "bold" }}>
-                          {event.user}
+                          {event?.user}
                         </Typography>
                         <QuestionAnswerIcon color="info" />
                       </div>
@@ -195,11 +197,11 @@ const EventDetails = () => {
                 <img
                   className="object-cover"
                   width="100%"
-                  src={event.imageUrl}
+                  src={event?.imageUrl}
                   alt="event photo"
                 />
                 <div className="mt-6">
-                  <DescriptionDisplay description={event.description} />
+                  <DescriptionDisplay description={event?.description ?? ""} />
                 </div>
               </div>
               <div className="col-span-1">
@@ -209,11 +211,11 @@ const EventDetails = () => {
                       <AccessTimeIcon />
                       <div>
                         <Typography variant="body1">
-                          {dayjs(event.startTime).format("dddd D MMMM YYYY")}
+                          {dayjs(event?.startTime).format("dddd D MMMM YYYY")}
                         </Typography>
                         <Typography variant="body1">
-                          {dayjs(event.startTime).format("h:mm A")} to{" "}
-                          {dayjs(event.endTime).format("h:mm A")}
+                          {dayjs(event?.startTime).format("h:mm A")} to{" "}
+                          {dayjs(event?.endTime).format("h:mm A")}
                         </Typography>
                       </div>
                     </div>
@@ -222,7 +224,7 @@ const EventDetails = () => {
                       <LocationOnOutlinedIcon />
                       <div>
                         <Typography variant="body1">
-                          {event.location}
+                          {event?.location}
                         </Typography>
                       </div>
                     </div>
@@ -237,16 +239,18 @@ const EventDetails = () => {
               <div className="w-3/4 grid grid-cols-7 gap-2 items-center">
                 <div className="col-span-4">
                   <Typography>
-                    {dayjs(event.startTime).format("ddd, MMM D · HH:mm")}
+                    {dayjs(event?.startTime).format("ddd, MMM D · HH:mm")}
                   </Typography>
                   <Typography style={{ fontWeight: "bold" }}>
-                    {event.title}
+                    {event?.title}
                   </Typography>
                 </div>
                 <div className="col-span-1">
-                  <Typography>
-                    {event.maxAttendees - event.currentAttendees} spots left
-                  </Typography>
+                  {event && (
+                    <Typography>
+                      {event.maxAttendees - event.currentAttendees} spots left
+                    </Typography>
+                  )}
                 </div>
                 <div className="col-span-2 text-right">
                   {isPastEvent ? (
@@ -274,7 +278,9 @@ const EventDetails = () => {
                       <Button
                         color="error"
                         variant="contained"
-                        onClick={() => handleWaitlist(jwt, eventId)}
+                        onClick={() => {
+                          if (jwt && eventId) handleWaitlist(jwt, eventId);
+                        }}
                       >
                         Add Waitlist
                       </Button>
@@ -284,7 +290,7 @@ const EventDetails = () => {
                       color="error"
                       variant="contained"
                       onClick={() => {
-                        if (isAuthenticated) {
+                        if (isAuthenticated && jwt && event) {
                           handleEventAttending(jwt, event.id);
                         } else {
                           setOpenLoginDialog(true);
@@ -308,7 +314,9 @@ const EventDetails = () => {
         message="Are you sure you want to withdraw from this event?"
         actionName="Yes"
         action={() => {
-          handleWithdraw(jwt, event.id);
+          if (jwt && event) {
+            handleWithdraw(jwt, event.id);
+          }
           setOpenWithdrawDialog(false);
         }}
       />
@@ -319,7 +327,9 @@ const EventDetails = () => {
         message="Are you sure you want to cancel the waitlist?"
         actionName="Yes"
         action={() => {
-          handleCancelWaitlist(jwt, event.id);
+          if (jwt && event) {
+            handleCancelWaitlist(jwt, event.id);
+          }
           setOpenCancelWaitlistDialog(false);
         }}
       />
