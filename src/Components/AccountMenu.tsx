@@ -263,7 +263,7 @@ const AccountMenu = () => {
               fullWidth
             />
             <TextField
-              label="Nickname (optional)"
+              label="Nickname"
               id="nickname"
               name="nickname"
               margin="dense"
