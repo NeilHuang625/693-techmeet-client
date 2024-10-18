@@ -116,7 +116,8 @@ const CreateEvent = () => {
   }
 
   const { ref } = usePlacesWidget({
-    apiKey: import.meta.env.VITE_GOOGLE_API_KEY,
+    // apiKey: import.meta.env.VITE_GOOGLE_API_KEY,
+    apiKey: process.env.VITE_GOOGLE_API_KEY,
     onPlaceSelected: (place) => {
       const city = place.address_components.find(
         (component: AddressComponent) => component.types.includes("locality")
