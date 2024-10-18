@@ -115,6 +115,9 @@ const CreateEvent = () => {
     types: string[];
   }
 
+  console.log("apiKey", process.env.VITE_GOOGLE_API_KEY);
+  console.log("apiKey2", import.meta.env.VITE_GOOGLE_API_KEY);
+
   const { ref } = usePlacesWidget({
     // apiKey: import.meta.env.VITE_GOOGLE_API_KEY,
     apiKey: process.env.VITE_GOOGLE_API_KEY,
