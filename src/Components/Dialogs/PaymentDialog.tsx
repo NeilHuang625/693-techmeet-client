@@ -13,6 +13,7 @@ import {
   MenuItem,
   Stack,
 } from "@mui/material";
+import { toast } from "react-toastify";
 interface PaymentDialogProps {
   open: boolean;
   onClose: () => void;
@@ -35,6 +36,7 @@ const PaymentDialog: React.FC<PaymentDialogProps> = ({ open, onClose }) => {
       try {
         const response = await upgradeToVIP(jwt);
         if (response.status === 200) {
+          toast.success("Payment successful");
           onClose();
           const jwt = response.data.token.result;
           setJwt(jwt);
