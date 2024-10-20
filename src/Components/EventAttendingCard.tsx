@@ -1,6 +1,6 @@
 import { Divider, Stack, Typography } from "@mui/material";
 import dayjs from "dayjs";
-import utc from "dayjs/plugin/utc";
+import utc from "dayjs-plugin-utc";
 import timezone from "dayjs/plugin/timezone";
 import advancedFormat from "dayjs/plugin/advancedFormat";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";

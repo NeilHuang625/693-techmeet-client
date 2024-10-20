@@ -23,7 +23,7 @@ import {
 import { createContext, useEffect, useState } from "react";
 import { useAuth } from "./Contexts/AuthProvider";
 import dayjs from "dayjs";
-import utc from "dayjs/plugin/utc";
+import utc from "dayjs-plugin-utc";
 import * as signalR from "@microsoft/signalr";
 import { MessageProps } from "./pages/Chat";
 import React from "react";
