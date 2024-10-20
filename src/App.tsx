@@ -23,7 +23,6 @@ import {
 import { createContext, useEffect, useState } from "react";
 import { useAuth } from "./Contexts/AuthProvider";
 import dayjs from "dayjs";
-// import utc from "dayjs/plugin/utc";
 import * as signalR from "@microsoft/signalr";
 import { MessageProps } from "./pages/Chat";
 import React from "react";
@@ -132,19 +131,12 @@ function App() {
 
   const { isAuthenticated, user, isLoading, jwt } = useAuth();
 
-  // dayjs.extend(utc);
-
   useEffect(() => {
     const fetchEvents = async () => {
       try {
         const response = await getAllEvents();
         const eventsWithLocalTime = response.data.map((event: AppEvent) => ({
           ...event,
-          // startTime: dayjs
-          //   .utc(event.startTime)
-          //   .local()
-          //   .format("YYYY-MM-DD HH:mm"),
-          // endTime: dayjs.utc(event.endTime).local().format("YYYY-MM-DD HH:mm"),
           startTime: dayjs(event.startTime).format("YYYY-MM-DD HH:mm"),
           endTime: dayjs(event.endTime).format("YYYY-MM-DD HH:mm"),
         }));
@@ -214,14 +206,12 @@ function App() {
       try {
         if (jwt) {
           const response = await getAllNotifications(jwt);
-          console.log("utc", response.data);
           const notificationsWithLocalTime = response.data.map(
             (n: Notification) => ({
               ...n,
-              createdAt: dayjs.utc(n.createdAt).local().format(),
+              createdAt: dayjs(n.createdAt).format(),
             })
           );
-          console.log("local", notificationsWithLocalTime);
           setNotifications(notificationsWithLocalTime);
         } else {
           console.log("JWT is not defined");

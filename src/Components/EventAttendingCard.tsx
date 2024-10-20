@@ -1,6 +1,5 @@
 import { Divider, Stack, Typography } from "@mui/material";
 import dayjs from "dayjs";
-// import utc from "dayjs-plugin-utc";
 import timezone from "dayjs/plugin/timezone";
 import advancedFormat from "dayjs/plugin/advancedFormat";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
@@ -9,7 +8,6 @@ import { AppContext, AppEvent } from "../App";
 import React, { useContext } from "react";
 import { useNavigate } from "react-router-dom";
 
-// dayjs.extend(utc);
 dayjs.extend(timezone);
 dayjs.extend(advancedFormat);
 

@@ -7,7 +7,6 @@ import { markMessagesAsRead, getReceiverInfo } from "../Utils/API";
 import checkUnreadMessage from "../Utils/checkUnreadMessage";
 import { useAuth } from "../Contexts/AuthProvider";
 import dayjs from "dayjs";
-import utc from "dayjs/plugin/utc";
 import relativeTime from "dayjs/plugin/relativeTime";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
@@ -23,7 +22,6 @@ import { FormControl, FormHelperText, InputAdornment } from "@mui/material";
 import Loading from "../Components/Loading";
 import { User } from "../Contexts/AuthProvider";
 
-dayjs.extend(utc);
 dayjs.extend(relativeTime);
 
 export interface MessageProps {
@@ -324,10 +322,9 @@ const Chat = () => {
                           }}
                         >
                           {dayjs(
-                            dayjs
-                              .utc(messages[messages.length - 1]?.createdAt)
-                              .local()
-                              .format()
+                            dayjs(
+                              messages[messages.length - 1]?.createdAt
+                            ).format()
                           ).fromNow()}
                         </div>
                         <div
@@ -414,9 +411,7 @@ const Chat = () => {
                               : "text-left text-sm text-gray-500 pl-12"
                           }`}
                         >
-                          {dayjs(
-                            dayjs.utc(message.createdAt).local().format()
-                          ).fromNow()}
+                          {dayjs(dayjs(message.createdAt).format()).fromNow()}
                         </div>
                       </div>
                     </div>
