@@ -7,7 +7,7 @@ import { markMessagesAsRead, getReceiverInfo } from "../Utils/API";
 import checkUnreadMessage from "../Utils/checkUnreadMessage";
 import { useAuth } from "../Contexts/AuthProvider";
 import dayjs from "dayjs";
-import utc from "dayjs-plugin-utc";
+import utc from "dayjs/plugin/utc";
 import relativeTime from "dayjs/plugin/relativeTime";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";

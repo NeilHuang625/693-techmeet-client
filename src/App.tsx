@@ -23,7 +23,7 @@ import {
 import { createContext, useEffect, useState } from "react";
 import { useAuth } from "./Contexts/AuthProvider";
 import dayjs from "dayjs";
-import utc from "dayjs-plugin-utc";
+// import utc from "dayjs/plugin/utc";
 import * as signalR from "@microsoft/signalr";
 import { MessageProps } from "./pages/Chat";
 import React from "react";
@@ -132,7 +132,7 @@ function App() {
 
   const { isAuthenticated, user, isLoading, jwt } = useAuth();
 
-  dayjs.extend(utc);
+  // dayjs.extend(utc);
 
   useEffect(() => {
     const fetchEvents = async () => {
@@ -140,11 +140,13 @@ function App() {
         const response = await getAllEvents();
         const eventsWithLocalTime = response.data.map((event: AppEvent) => ({
           ...event,
-          startTime: dayjs
-            .utc(event.startTime)
-            .local()
-            .format("YYYY-MM-DD HH:mm"),
-          endTime: dayjs.utc(event.endTime).local().format("YYYY-MM-DD HH:mm"),
+          // startTime: dayjs
+          //   .utc(event.startTime)
+          //   .local()
+          //   .format("YYYY-MM-DD HH:mm"),
+          // endTime: dayjs.utc(event.endTime).local().format("YYYY-MM-DD HH:mm"),
+          startTime: dayjs(event.startTime).format("YYYY-MM-DD HH:mm"),
+          endTime: dayjs(event.endTime).format("YYYY-MM-DD HH:mm"),
         }));
         setEvents(eventsWithLocalTime);
         setAllEvents(eventsWithLocalTime);
