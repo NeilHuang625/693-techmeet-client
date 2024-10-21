@@ -233,14 +233,14 @@ function App() {
       .withAutomaticReconnect()
       .build();
 
+    connection.start().catch((err) => console.log(err));
+
     connection.on("ReceiveNotification", (notification) => {
       setNotifications((preNotifications) => [
         ...preNotifications,
         notification,
       ]);
     });
-
-    connection.start().catch((err) => console.log(err));
 
     return () => {
       connection.stop().catch((err) => console.log(err));
