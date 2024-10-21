@@ -1,7 +1,7 @@
 import axios from "axios";
-export const basicURL = "http://localhost:5269"; // For local testing
-// export const basicURL =
-//   "https://techmeet2024-fkf6gdgzeqg7erc6.australiaeast-01.azurewebsites.net"; // For azure server
+// export const basicURL = "http://localhost:5269"; // For local testing
+export const basicURL =
+  "https://techmeet2024-fkf6gdgzeqg7erc6.australiaeast-01.azurewebsites.net"; // For azure server
 interface SignupUser {
   email: string;
   password: string;
