@@ -322,9 +322,10 @@ const Chat = () => {
                           }}
                         >
                           {dayjs(
-                            dayjs(
-                              messages[messages.length - 1]?.createdAt
-                            ).format()
+                            dayjs
+                              .utc(messages[messages.length - 1]?.createdAt)
+                              .local()
+                              .format()
                           ).fromNow()}
                         </div>
                         <div
@@ -411,7 +412,9 @@ const Chat = () => {
                               : "text-left text-sm text-gray-500 pl-12"
                           }`}
                         >
-                          {dayjs(dayjs(message.createdAt).format()).fromNow()}
+                          {dayjs(
+                            dayjs.utc(message.createdAt).local().format()
+                          ).fromNow()}
                         </div>
                       </div>
                     </div>

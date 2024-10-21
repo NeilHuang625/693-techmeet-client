@@ -117,7 +117,10 @@ const Message = () => {
                   <div className="col-span-5 right text-right mx-2">
                     <div className="text-sm">
                       {dayjs(
-                        dayjs(messages[messages.length - 1].createdAt).format()
+                        dayjs
+                          .utc(messages[messages.length - 1].createdAt)
+                          .local()
+                          .format()
                       ).fromNow()}
                     </div>
                     <ListItemIcon>

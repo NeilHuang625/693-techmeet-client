@@ -23,9 +23,14 @@ import {
 import { createContext, useEffect, useState } from "react";
 import { useAuth } from "./Contexts/AuthProvider";
 import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
+import timezone from "dayjs/plugin/timezone";
 import * as signalR from "@microsoft/signalr";
 import { MessageProps } from "./pages/Chat";
 import React from "react";
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 export interface AppEvent {
   id: number;
@@ -137,8 +142,11 @@ function App() {
         const response = await getAllEvents();
         const eventsWithLocalTime = response.data.map((event: AppEvent) => ({
           ...event,
-          startTime: dayjs(event.startTime).format("YYYY-MM-DD HH:mm"),
-          endTime: dayjs(event.endTime).format("YYYY-MM-DD HH:mm"),
+          startTime: dayjs
+            .utc(event.startTime)
+            .local()
+            .format("YYYY-MM-DD HH:mm"),
+          endTime: dayjs.utc(event.endTime).local().format("YYYY-MM-DD HH:mm"),
         }));
         setEvents(eventsWithLocalTime);
         setAllEvents(eventsWithLocalTime);
@@ -209,7 +217,7 @@ function App() {
           const notificationsWithLocalTime = response.data.map(
             (n: Notification) => ({
               ...n,
-              createdAt: dayjs(n.createdAt).format(),
+              createdAt: dayjs.utc(n.createdAt).local().format(),
             })
           );
           setNotifications(notificationsWithLocalTime);
