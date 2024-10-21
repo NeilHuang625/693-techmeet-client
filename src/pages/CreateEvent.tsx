@@ -27,6 +27,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import Footer from "../Components/Footer";
+import dayjs from "dayjs";
 
 const CreateEvent = () => {
   const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null);
@@ -57,8 +58,8 @@ const CreateEvent = () => {
     const formData = new FormData();
     formData.append("UserId", userId as string);
     formData.append("Title", newEvent.title);
-    formData.append("StartTime", newEvent.startTime);
-    formData.append("EndTime", newEvent.endTime);
+    formData.append("StartTime", dayjs(newEvent.startTime).format());
+    formData.append("EndTime", dayjs(newEvent.endTime).format());
     formData.append("Description", newEvent.description);
     formData.append("MaxAttendees", newEvent.maxAttendees.toString());
     formData.append("Location", newEvent.location);
