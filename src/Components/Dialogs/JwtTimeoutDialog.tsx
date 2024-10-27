@@ -38,10 +38,10 @@ const JwtTimeoutDialog = () => {
         if (jwt) handleLogout(jwt);
       }}
     >
-      <DialogTitle>Session Timeout</DialogTitle>
+      <DialogTitle>JWT Timeout</DialogTitle>
       <DialogContent>
         <p>
-          Your session will expire in {timeLeft / 1000} seconds. Do you want to
+          Your Token will expire in {timeLeft / 1000} seconds. Do you want to
           extend?
         </p>
       </DialogContent>
